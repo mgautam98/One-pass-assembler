@@ -1,1 +1,14 @@
-Some text
+SUM            START          4000
+               JLT            LOOP
+FIRST          LDX            ZERO
+               LDX            LOOP
+TABLE          RESW           100
+COUNT          RESW           1
+               LDA            ZERO
+LOOP           ADD            TABLE,X
+               TIX            COUNT
+               STA            TOTAL
+               RSUB
+TOTAL          RESW           1
+ZERO           WORD           0
+               END

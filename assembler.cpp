@@ -35,11 +35,22 @@ class Assembler
 vector<string> Assembler::tokenize(string str)
 {
     vector<string> tokens;
-    stringstream check1(str);
-    string intermediate;
-    while (getline(check1, intermediate, ' '))
+    string element;
+    for (int i = 0; i < str.length(); i++)
     {
-        tokens.push_back(intermediate);
+        if (str[i] == ' ' && element.length() != 0)
+        {
+            tokens.push_back(element);
+            element.clear();
+        }
+        else if (str[i] != ' ')
+        {
+            element += string(1, str[i]);
+        }
+    }
+    if (element.length() != 0)
+    {
+        tokens.push_back(element);
     }
     return tokens;
 }
@@ -59,7 +70,9 @@ void Assembler::displaySourceCode()
     cout << endl;
     cout << "\t\t================================================\n";
     for (string line; getline(file, line);)
+    {
         cout << "\t\t" << line << endl;
+    }
     cout << "\n\t\t================================================\n";
     file.close();
     return;
@@ -71,7 +84,7 @@ void Assembler::displayOptab()
     cout << "\t\t================================================\n";
     for (auto i : OPTAB)
     {
-        cout << "\t\t" << i.first << "\t:\t" << i.second << endl;
+        cout << "\t\t" << i.first << "\t\t:\t\t" << i.second << endl;
     }
     cout << "\n\t\t================================================\n";
     return;
@@ -111,7 +124,6 @@ void Assembler::populateOPTAB()
 void Assembler::generateObjectCode()
 {
     ifstream sourceFile(src_file_name.c_str());
-
 
     sourceFile.close();
 }
@@ -170,7 +182,7 @@ int main()
     while (1)
     {
         system("./menu.sh");
-        cout<<"\t\t\t\t\t";
+        cout << "\t\t\t\t\t";
         cin >> inp;
         if (inp == 2)
             break;
