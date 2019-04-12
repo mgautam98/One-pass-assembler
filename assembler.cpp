@@ -7,11 +7,17 @@ inline bool fileExists(const std::string &name)
     return f.good();
 }
 
+//TODO hex to dec
+//TODO dec to hex
+//TODO hex to bin
+//TODO bin to hex
+
 class Assembler
 {
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
+    map<int, vector<string>> records;
     string src_file_name;
     string symtab_file_name;
     string optab_file_name;
@@ -62,6 +68,7 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
     optab_file_name = optab;
     object_file_name = obj;
     populateOPTAB();
+    generateObjectCode();
 }
 
 void Assembler::displaySourceCode()
@@ -118,12 +125,34 @@ void Assembler::populateOPTAB()
             exit(0);
         }
     }
+    file.close();
     return;
 }
 
 void Assembler::generateObjectCode()
 {
+    bool firstLine = true;
+
     ifstream sourceFile(src_file_name.c_str());
+
+    for (string line; getline(sourceFile, line);)
+    {
+        vector<string> tokens = tokenize(line);
+        if (firstLine)  //first line
+        {
+            firstLine = false;
+            program_name = tokens[0];
+
+            if (tokens.size() == 3)
+            {
+                //TODO LOCCTR = hexa to deca
+            }
+            else
+            {
+                LOCCTR = 0;
+            }
+        }
+    }
 
     sourceFile.close();
 }
