@@ -244,8 +244,13 @@ void Assembler::generateObjectCode()
             else
                 first_executable_instruction = starting_address;
         }
-    }
 
+        //comment line
+        if (tokens[0].compare(".") == 0)
+            continue;
+
+            
+    }
     sourceFile.close();
 }
 

@@ -2,6 +2,7 @@ SUM            START          4000
                JLT            LOOP
 FIRST          LDX            ZERO
                LDX            LOOP
+.   This is a comment line __
 TABLE          RESW           100
 COUNT          RESW           1
                LDA            ZERO
