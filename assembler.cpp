@@ -21,6 +21,8 @@ class Assembler
     string end_record;
     string program_name;
     int starting_address;
+    int ending_address;
+    int first_executable_instruction;
     int LOCCTR;
 
   public:
@@ -206,6 +208,8 @@ void Assembler::generateObjectCode()
     for (string line; getline(sourceFile, line);)
     {
         vector<string> tokens = tokenize(line);
+
+        //For First line of program
         if (firstLine)
         {
             firstLine = false;
@@ -230,6 +234,15 @@ void Assembler::generateObjectCode()
                 starting_address = 0;
             }
             continue;
+        }
+        //FOR Last line of program
+        if (tokens[0].compare("END") == 0)
+        {
+            ending_address = LOCCTR;
+            if (tokens.size() > 1)
+                first_executable_instruction = hexToDec(tokens[1]);
+            else
+                first_executable_instruction = starting_address;
         }
     }
 
