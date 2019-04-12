@@ -50,9 +50,10 @@ void Assembler::displaySourceCode()
 {
     ifstream ifs(src_file_name.c_str());
     cout << endl;
+    cout << "\t\t================================================\n";
     for (string line; getline(ifs, line);)
         cout << "\t\t" << line << endl;
-    cout << endl;
+    cout << "\n\t\t================================================\n";
     return;
 }
 
@@ -60,11 +61,12 @@ void Assembler::displayOptab()
 {
     ifstream ifs(optab_file_name.c_str());
     cout << endl;
+    cout << "\t\t================================================\n";
     for (auto i : OPTAB)
     {
-        cout << i.first << "\t:\t" << i.second << endl;
+        cout << "\t\t" << i.first << "\t:\t" << i.second << endl;
     }
-    cout << endl;
+    cout << "\n\t\t================================================\n";
     return;
 }
 
@@ -72,9 +74,10 @@ void Assembler::displayObjectCode()
 {
     ifstream ifs(object_file_name.c_str());
     cout << endl;
+    cout << "\t\t================================================\n";
     for (string line; getline(ifs, line);)
         cout << "\t\t" << line << endl;
-    cout << endl;
+    cout << "\n\t\t================================================\n";
     return;
 }
 
