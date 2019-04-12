@@ -14,14 +14,28 @@ class Assembler
     string symtab_file_name;
     string optab_file_name;
     string object_file_name;
+    map<string, string> OPTAB;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
     void displaySourceCode();
     void displayOptab();
     void displayObjectCode();
+    void populateOPTAB();
+    vector<string> tokenize(string str);
 };
 
+vector<string> Assembler::tokenize(string str)
+{
+    vector<string> tokens;
+    stringstream check1(str);
+    string intermediate;
+    while (getline(check1, intermediate, ' '))
+    {
+        tokens.push_back(intermediate);
+    }
+    return tokens;
+}
 
 Assembler::Assembler(string src, string optab, string symtab, string obj)
 {
@@ -31,36 +45,47 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
     object_file_name = obj;
 }
 
-void Assembler::displaySourceCode(){
+void Assembler::displaySourceCode()
+{
     ifstream ifs(src_file_name.c_str());
-    cout<<endl;
-	for(string line; getline(ifs, line);)
-		cout<<"\t\t"<<line<<endl;
-    cout<<endl;
-	return;
+    cout << endl;
+    for (string line; getline(ifs, line);)
+        cout << "\t\t" << line << endl;
+    cout << endl;
+    return;
 }
 
-void Assembler::displayOptab(){
+void Assembler::displayOptab()
+{
     ifstream ifs(optab_file_name.c_str());
-    cout<<endl;
-	for(string line; getline(ifs, line);)
-		cout<<"\t\t"<<line<<endl;
-    cout<<endl;
-	return;
+    cout << endl;
+    for (string line; getline(ifs, line);)
+        cout << "\t\t" << line << endl;
+    cout << endl;
+    return;
 }
 
-void Assembler::displayObjectCode(){
+void Assembler::displayObjectCode()
+{
     ifstream ifs(object_file_name.c_str());
-    cout<<endl;
-	for(string line; getline(ifs, line);)
-		cout<<"\t\t"<<line<<endl;
-    cout<<endl;
-	return;
+    cout << endl;
+    for (string line; getline(ifs, line);)
+        cout << "\t\t" << line << endl;
+    cout << endl;
+    return;
+}
+
+void Assembler::populateOPTAB()
+{
+    ifstream ifs(optab_file_name.c_str());
+    for (string line; getline(ifs, line);)
+        cout << "\t\t" << line << endl;
+    return;
 }
 
 void assembleNewProgram()
 {
-    char inp;
+    int inp;
     string src, optab, object, symtab;
     cout << "\n\t\tSource File Name  :  ";
     cin >> src;
@@ -76,16 +101,33 @@ void assembleNewProgram()
         return;
     }
     Assembler newProgram(src, optab, symtab, object);
-    cout<<"\t\tDisplay source code? (Y | N)\n";
-    cin>>inp;
-    if(inp=='Y' || inp=='y')    newProgram.displaySourceCode();
-    cout<<"\t\tDisplay OPTAB? (Y | N)\n";
-    cin>>inp;
-    if(inp=='Y' || inp=='y')    newProgram.displayOptab();
-    cout<<"\t\tDisplay object code? (Y | N)\n";
-    cin>>inp;
-    if(inp=='Y' || inp=='y')    newProgram.displaySourceCode();
+    while (1)
+    {
+        cout << "\n\n\t\t1. Display source code\n";
+        cout << "\t\t2. Display OPTAB\n";
+        cout << "\t\t3. Display object code\n";
+        cout << "\t\t4. Return to Main\n";
+        cout << " \n\t\tEnter your choice : ";
+        cin >> inp;
+        if (inp == 4)
+            break;
+        switch (inp)
+        {
+        case 1:
+            newProgram.displaySourceCode();
+            break;
+        case 2:
+            newProgram.displayOptab();
+            break;
+        case 3:
+            newProgram.displayObjectCode();
+            break;
 
+        default:
+            cout << "\t\tEnter valid choice\n\n";
+            break;
+        }
+    }
 }
 
 int main()
