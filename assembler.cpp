@@ -7,58 +7,6 @@ inline bool fileExists(const std::string &name)
     return f.good();
 }
 
-//TODO hex to dec
-int hexToDec(string s) {
-    int dval = 0;
-    int a;
-    for(int i=0; i<s.length();i++){
-        if(s[i]=='0') a = 0;
-        if(s[i]=='1') a = 1;
-        if(s[i]=='2') a = 2;
-        if(s[i]=='3') a = 3;
-        if(s[i]=='4') a = 4;
-        if(s[i]=='5') a = 5;
-        if(s[i]=='6') a = 6;
-        if(s[i]=='7') a = 7;
-        if(s[i]=='8') a = 8;
-        if(s[i]=='9') a = 9;
-        if(s[i]=='A') a = 10;
-        if(s[i]=='B') a = 11;
-        if(s[i]=='C') a = 12;
-        if(s[i]=='D') a = 13;
-        if(s[i]=='E') a = 14;
-        if(s[i]=='F') a = 15;
-        dval = a + dval*16;
-    }
-    return dval;
-}
-//TODO dec to hex
-string decToHex(int a) {
-    string hexlist = "0123456789ABCDEF";
-    string hstr = "";
-    while(a)
-    {
-        hstr = hexlist[a%16] + hstr;
-        a /= 16;
-    }
-    return hstr;
-}
-//TODO hex to bin
-string hexToBin(string s){
-    string htb;
-    for(auto i: s){
-        int n;
-        if(i <= '9' and i >= '0')
-            n = i - '0';
-        else
-            n = 10 + i - 'A';
-        for(int j = 3; j >= 0; --j)
-            htb.push_back((n & (1<<j))? '1':'0');
-    }
-    return htb;
-}
-//TODO bin to hex
-
 class Assembler
 {
   private:
@@ -83,7 +31,80 @@ class Assembler
     void populateOPTAB();
     void generateObjectCode();
     vector<string> tokenize(string str);
+    int hexToDec(string s);
+    string decToHex(int a);
+    string hexToBin(string s);
 };
+
+int Assembler::hexToDec(string s)
+{
+    int dval = 0;
+    int a;
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (s[i] == '0')
+            a = 0;
+        if (s[i] == '1')
+            a = 1;
+        if (s[i] == '2')
+            a = 2;
+        if (s[i] == '3')
+            a = 3;
+        if (s[i] == '4')
+            a = 4;
+        if (s[i] == '5')
+            a = 5;
+        if (s[i] == '6')
+            a = 6;
+        if (s[i] == '7')
+            a = 7;
+        if (s[i] == '8')
+            a = 8;
+        if (s[i] == '9')
+            a = 9;
+        if (s[i] == 'A')
+            a = 10;
+        if (s[i] == 'B')
+            a = 11;
+        if (s[i] == 'C')
+            a = 12;
+        if (s[i] == 'D')
+            a = 13;
+        if (s[i] == 'E')
+            a = 14;
+        if (s[i] == 'F')
+            a = 15;
+        dval = a + dval * 16;
+    }
+    return dval;
+}
+string Assembler::decToHex(int a)
+{
+    string hexlist = "0123456789ABCDEF";
+    string hstr = "";
+    while (a)
+    {
+        hstr = hexlist[a % 16] + hstr;
+        a /= 16;
+    }
+    return hstr;
+}
+
+string Assembler::hexToBin(string s)
+{
+    string htb;
+    for (auto i : s)
+    {
+        int n;
+        if (i <= '9' and i >= '0')
+            n = i - '0';
+        else
+            n = 10 + i - 'A';
+        for (int j = 3; j >= 0; --j)
+            htb.push_back((n & (1 << j)) ? '1' : '0');
+    }
+    return htb;
+}
 
 vector<string> Assembler::tokenize(string str)
 {
@@ -185,29 +206,30 @@ void Assembler::generateObjectCode()
     for (string line; getline(sourceFile, line);)
     {
         vector<string> tokens = tokenize(line);
-        if (firstLine)  //first line
+        if (firstLine)
         {
             firstLine = false;
             program_name = tokens[0];
 
             if (tokens.size() == 3)
             {
-                if(tokens[1].compare(string("START")) == 0)
-				{
-					LOCCTR = hexToDec(tokens[2]);
-					starting_address = LOCCTR;
-					continue;
-				}
-				else
-				{
-					LOCCTR = 0;
-					starting_address = 0;
+                if (tokens[1].compare(string("START")) == 0)
+                {
+                    LOCCTR = hexToDec(tokens[2]);
+                    starting_address = LOCCTR;
+                }
+                else
+                {
+                    LOCCTR = 0;
+                    starting_address = 0;
                 }
             }
             else
             {
                 LOCCTR = 0;
+                starting_address = 0;
             }
+            continue;
         }
     }
 
