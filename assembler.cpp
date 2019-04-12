@@ -43,6 +43,7 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
     symtab_file_name = symtab;
     optab_file_name = optab;
     object_file_name = obj;
+    populateOPTAB();
 }
 
 void Assembler::displaySourceCode()
@@ -59,8 +60,10 @@ void Assembler::displayOptab()
 {
     ifstream ifs(optab_file_name.c_str());
     cout << endl;
-    for (string line; getline(ifs, line);)
-        cout << "\t\t" << line << endl;
+    for (auto i : OPTAB)
+    {
+        cout << i.first << "\t:\t" << i.second << endl;
+    }
     cout << endl;
     return;
 }
@@ -79,7 +82,18 @@ void Assembler::populateOPTAB()
 {
     ifstream ifs(optab_file_name.c_str());
     for (string line; getline(ifs, line);)
-        cout << "\t\t" << line << endl;
+    {
+        vector<string> tokens = tokenize(line);
+        if (OPTAB.find(tokens[0]) == OPTAB.end())
+        {
+            OPTAB.insert({tokens[0], tokens[1]});
+        }
+        else
+        {
+            cout << "\n\t\tDuplicate OPCODE! Exiting\n\n";
+            exit(0);
+        }
+    }
     return;
 }
 
