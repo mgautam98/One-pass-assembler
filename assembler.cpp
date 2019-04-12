@@ -29,11 +29,6 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
     symtab_file_name = symtab;
     optab_file_name = optab;
     object_file_name = obj;
-    if (!fileExists(src_file_name) || !fileExists(optab_file_name))
-    {
-        cout << "\n\t\t SOURCE FILE OR OPTAB DOESN'T EXISTS\n\n";
-        system("sleep 3");
-    }
 }
 
 void Assembler::displaySourceCode(){
@@ -50,8 +45,16 @@ void Assembler::displayOptab(){
 	return;
 }
 
+void Assembler::displayObjectCode(){
+    ifstream ifs(object_file_name.c_str());
+	for(string line; getline(ifs, line);)
+		cout<<line<<endl;
+	return;
+}
+
 void assembleNewProgram()
 {
+    char inp;
     string src, optab, object, symtab;
     cout << "\n\t\tSource File Name  :  ";
     cin >> src;
@@ -60,7 +63,23 @@ void assembleNewProgram()
     cout << "\t\tFile name where Object Code will be stored  :  ";
     cin >> object;
     symtab = "symtab.txt";
-    Assembler(src, optab, symtab, object);
+    if (!fileExists(src) || !fileExists(optab))
+    {
+        cout << "\n\t\t SOURCE FILE OR OPTAB DOESN'T EXISTS\n\n";
+        system("sleep 3");
+        return;
+    }
+    Assembler newProgram(src, optab, symtab, object);
+    cout<<"\t\tDisplay source code? (Y | N)\n";
+    cin>>inp;
+    if(inp=='Y' || inp=='y')    newProgram.displaySourceCode();
+    cout<<"\t\tDisplay OPTAB? (Y | N)\n";
+    cin>>inp;
+    if(inp=='Y' || inp=='y')    newProgram.displayOptab();
+    cout<<"\t\tDisplay object code? (Y | N)\n";
+    cin>>inp;
+    if(inp=='Y' || inp=='y')    newProgram.displaySourceCode();
+
 }
 
 int main()
