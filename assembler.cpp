@@ -10,11 +10,17 @@ inline bool fileExists(const std::string &name)
 class Assembler
 {
   private:
+    map<string, string> OPTAB;
+    map<string, pair<int, list<int>>> SYMTAB;
     string src_file_name;
     string symtab_file_name;
     string optab_file_name;
     string object_file_name;
-    map<string, string> OPTAB;
+    string header_record;
+    string end_record;
+    string program_name;
+    int starting_address;
+    int LOCCTR;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
@@ -22,6 +28,7 @@ class Assembler
     void displayOptab();
     void displayObjectCode();
     void populateOPTAB();
+    void generateObjectCode();
     vector<string> tokenize(string str);
 };
 
@@ -48,18 +55,18 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
 
 void Assembler::displaySourceCode()
 {
-    ifstream ifs(src_file_name.c_str());
+    ifstream file(src_file_name.c_str());
     cout << endl;
     cout << "\t\t================================================\n";
-    for (string line; getline(ifs, line);)
+    for (string line; getline(file, line);)
         cout << "\t\t" << line << endl;
     cout << "\n\t\t================================================\n";
+    file.close();
     return;
 }
 
 void Assembler::displayOptab()
 {
-    ifstream ifs(optab_file_name.c_str());
     cout << endl;
     cout << "\t\t================================================\n";
     for (auto i : OPTAB)
@@ -72,19 +79,20 @@ void Assembler::displayOptab()
 
 void Assembler::displayObjectCode()
 {
-    ifstream ifs(object_file_name.c_str());
+    ifstream file(object_file_name.c_str());
     cout << endl;
     cout << "\t\t================================================\n";
-    for (string line; getline(ifs, line);)
+    for (string line; getline(file, line);)
         cout << "\t\t" << line << endl;
     cout << "\n\t\t================================================\n";
+    file.close();
     return;
 }
 
 void Assembler::populateOPTAB()
 {
-    ifstream ifs(optab_file_name.c_str());
-    for (string line; getline(ifs, line);)
+    ifstream file(optab_file_name.c_str());
+    for (string line; getline(file, line);)
     {
         vector<string> tokens = tokenize(line);
         if (OPTAB.find(tokens[0]) == OPTAB.end())
@@ -100,17 +108,24 @@ void Assembler::populateOPTAB()
     return;
 }
 
+void Assembler::generateObjectCode()
+{
+    ifstream sourceFile(src_file_name.c_str());
+
+
+    sourceFile.close();
+}
+
 void assembleNewProgram()
 {
     int inp;
     string src, optab, object, symtab;
     cout << "\n\t\tSource File Name  :  ";
     cin >> src;
-    cout << "\t\tOPTAB file Name  :  ";
-    cin >> optab;
     cout << "\t\tFile name where Object Code will be stored  :  ";
     cin >> object;
     symtab = "symtab.txt";
+    optab = "optab.txt";
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\t SOURCE FILE OR OPTAB DOESN'T EXISTS\n\n";
@@ -155,6 +170,7 @@ int main()
     while (1)
     {
         system("./menu.sh");
+        cout<<"\t\t\t\t\t";
         cin >> inp;
         if (inp == 2)
             break;
