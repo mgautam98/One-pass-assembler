@@ -8,21 +8,19 @@ class Assembler{
     public:
     
     Assembler(){
-        
+
     }
-}
+};
 
 
 int main()
 {
-
+    system("chmod +x menu.sh");
     int inp;
 
     while (1)
     {
-        cout << "\t\t1. Assemble new program\n";
-        cout << "\t\t2. Exit\n\n";
-        cout << "\t\tEnter your choice\t:\t";
+        system("./menu.sh");
         cin >> inp;
         if (inp == 2)
             break;
@@ -31,7 +29,8 @@ int main()
         case 1: //assemble
             break;
         default:
-            cout << "\t\tInvalid Input\n\n";
+            cout << "\n\t\tInvalid Input\n\n";
+            system("sleep 1");
         }
     }
 
