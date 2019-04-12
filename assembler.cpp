@@ -33,22 +33,28 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
 
 void Assembler::displaySourceCode(){
     ifstream ifs(src_file_name.c_str());
+    cout<<endl;
 	for(string line; getline(ifs, line);)
-		cout<<line<<endl;
+		cout<<"\t\t"<<line<<endl;
+    cout<<endl;
 	return;
 }
 
 void Assembler::displayOptab(){
     ifstream ifs(optab_file_name.c_str());
+    cout<<endl;
 	for(string line; getline(ifs, line);)
-		cout<<line<<endl;
+		cout<<"\t\t"<<line<<endl;
+    cout<<endl;
 	return;
 }
 
 void Assembler::displayObjectCode(){
     ifstream ifs(object_file_name.c_str());
+    cout<<endl;
 	for(string line; getline(ifs, line);)
-		cout<<line<<endl;
+		cout<<"\t\t"<<line<<endl;
+    cout<<endl;
 	return;
 }
 
