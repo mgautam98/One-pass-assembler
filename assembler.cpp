@@ -193,6 +193,18 @@ void Assembler::generateObjectCode()
             if (tokens.size() == 3)
             {
                 //TODO LOCCTR = hexa to deca
+                if(tokens[1].compare(string("START")) == 0)
+				{
+					LOCCTR = hexToDec(tokens[2]);
+					starting_address = LOCCTR;
+					program_name = tokens[0];
+					continue;
+				}
+				else
+				{
+					LOCCTR = 0;
+					starting_address = 0;
+                }
             }
             else
             {
