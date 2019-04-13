@@ -224,10 +224,9 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-
+            
             tokens[0] = tokens[0].substr(0, 6);
-            program_name.replace(6 - tokens[0].size(), 6, tokens[0]);
-
+            program_name.replace(tokens[0].size(), 6, tokens[0]);
             if (tokens.size() == 3)
             {
                 if (tokens[1].compare(string("START")) == 0)
@@ -385,12 +384,13 @@ void Assembler::generateObjectCode()
     symout.close();
 
     ofstream objout(object_file_name.c_str());
-    objout << "H" << program_name << decToHex(starting_address) << decToHex(ending_address-starting_address + 3) << endl;
+    objout << "H" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address));
+    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
             break;
-        objout << "T" << (records[i].second)[0] << decToHex(records[i].first);
+        objout << "T" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first));
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
@@ -399,7 +399,7 @@ void Assembler::generateObjectCode()
                 objout << (records[i].second)[j] << endl;
         }
     }
-    objout << "E" << decToHex(first_executable_instruction) << endl;
+    objout << "E" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
     objout.close();
 }
 
