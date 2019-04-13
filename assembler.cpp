@@ -309,6 +309,21 @@ void Assembler::generateObjectCode()
         //handling opcode
         if (OPTAB.find(opcode) != OPTAB.end())
         {
+            if (SYMTAB.find(operand) != SYMTAB.end())
+            {
+                if (SYMTAB[operand].first != -1)
+                {
+                }
+                else
+                {
+                    SYMTAB[operand].second.push_back(LOCCTR);
+                }
+            }
+            else
+            {
+                SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
+                SYMTAB[operand].second.push_back(LOCCTR);
+            }
             LOCCTR += 3;
         }
         else
