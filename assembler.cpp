@@ -1,4 +1,24 @@
+#ifdef __unix__
+
+#define OS_Windows 0
 #include <bits/stdc++.h>
+
+#elif defined(_WIN32) || defined(WIN32)
+
+#define OS_Windows 1
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <stack>
+#include <queue>
+#include <fstream>
+#include <algorithm>
+#include <sstream>
+#include <math.h>
+
+#endif
+
 using namespace std;
 
 inline bool fileExists(const string &name)
@@ -303,7 +323,7 @@ void Assembler::generateObjectCode()
             {
                 if (operand[0] == 'X')
                 {
-                    LOCCTR ++;
+                    LOCCTR++;
                 }
                 else
                 {
@@ -385,7 +405,11 @@ int main()
 
     while (1)
     {
-        system("./menu.sh");
+        if(!OS_Windows)
+            system("./menu.sh");
+        else
+            system("sh menu.sh");
+            
         cout << "\t\t\t\t\t";
         cin >> inp;
         if (inp == 2)
