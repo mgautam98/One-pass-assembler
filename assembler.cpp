@@ -356,7 +356,7 @@ void Assembler::generateObjectCode()
                 if (operand[0] == 'X')
                 {
                     constantValue += operand[2];
-                    constantValue + operand[3];
+                    constantValue += operand[3];
                     LOCCTR++;
                 }
                 else
