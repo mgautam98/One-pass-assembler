@@ -34,7 +34,7 @@ class Assembler
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
-    map<int, vector<string>> records;
+    map<int, pair<int, vector<string>>> records;
     string src_file_name;
     string symtab_file_name;
     string optab_file_name;
@@ -66,26 +66,8 @@ int Assembler::hexToDec(string s)
     int a;
     for (int i = 0; i < s.length(); i++)
     {
-        if (s[i] == '0')
-            a = 0;
-        if (s[i] == '1')
-            a = 1;
-        if (s[i] == '2')
-            a = 2;
-        if (s[i] == '3')
-            a = 3;
-        if (s[i] == '4')
-            a = 4;
-        if (s[i] == '5')
-            a = 5;
-        if (s[i] == '6')
-            a = 6;
-        if (s[i] == '7')
-            a = 7;
-        if (s[i] == '8')
-            a = 8;
-        if (s[i] == '9')
-            a = 9;
+        if(isdigit((char)s[i]))
+            a = s[i] - '0';
         if (s[i] == 'A')
             a = 10;
         if (s[i] == 'B')
