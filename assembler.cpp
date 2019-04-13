@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-inline bool fileExists(const std::string &name)
+inline bool fileExists(const string &name)
 {
     ifstream f(name.c_str());
     return f.good();
