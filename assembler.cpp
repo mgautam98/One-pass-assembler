@@ -235,7 +235,7 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-            program_name = tokens[0];
+            program_name = tokens[0].substr(0, 6);
 
             if (tokens.size() == 3)
             {
@@ -295,8 +295,6 @@ void Assembler::generateObjectCode()
                 if (SYMTAB[label].first == -1)
                 {
                     SYMTAB[label].first = LOCCTR;
-
-                    //TODO
                 }
                 else
                 {
@@ -307,12 +305,23 @@ void Assembler::generateObjectCode()
         }
 
         //handling opcode
+        string newRecord = "000000";
+        bool indexRegister = false;
+
+        if(operand[operand.size()-1]=='X'){
+            indexRegister = true;
+            operand = operand.substr(0, operand.size()-2);
+        }
+
         if (OPTAB.find(opcode) != OPTAB.end())
         {
+            newRecord.replace(0, 2, OPTAB[opcode]);
             if (SYMTAB.find(operand) != SYMTAB.end())
             {
                 if (SYMTAB[operand].first != -1)
                 {
+                    string addressFeild = decToHex(SYMTAB[operand].first);
+                    newRecord.replace(6 - addressFeild.size(), 6, addressFeild);
                 }
                 else
                 {
