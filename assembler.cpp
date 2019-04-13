@@ -10,6 +10,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <list>
+#include <utility>
 #include <stack>
 #include <queue>
 #include <fstream>
@@ -405,11 +407,8 @@ int main()
 
     while (1)
     {
-        if(!OS_Windows)
-            system("./menu.sh");
-        else
-            system("sh menu.sh");
-            
+        system("./menu.sh");
+
         cout << "\t\t\t\t\t";
         cin >> inp;
         if (inp == 2)
