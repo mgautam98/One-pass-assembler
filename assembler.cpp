@@ -260,6 +260,8 @@ void Assembler::generateObjectCode()
             opcode = tokens[1];
             operand = tokens[2];
         }
+
+        //handling label
         if (tokens.size() == 3)
         {
             if (SYMTAB.find(label) == SYMTAB.end())
@@ -268,12 +270,21 @@ void Assembler::generateObjectCode()
             }
             else if (SYMTAB.find(label) != SYMTAB.end())
             {
-                if (SYMTAB[label].first == 0)
+                if (SYMTAB[label].first == -1)
                 {
                     SYMTAB[label].first = LOCCTR;
+
+                    //TODO
+                }
+                else
+                {
+                    cout << "\n\t\tDuplicate Label\n";
+                    exit(0);
                 }
             }
         }
+
+        //handling opcode
         if (OPTAB.find(opcode) != OPTAB.end())
         {
             LOCCTR += 3;
@@ -290,7 +301,14 @@ void Assembler::generateObjectCode()
             }
             else if (opcode.compare(string("BYTE")) == 0)
             {
-                LOCCTR += operand.length() - 3;
+                if (operand[0] == 'X')
+                {
+                    LOCCTR ++;
+                }
+                else
+                {
+                    LOCCTR += operand.length() - 3;
+                }
             }
             else if (opcode.compare(string("RESB")) == 0)
             {
@@ -298,19 +316,20 @@ void Assembler::generateObjectCode()
             }
             else
             {
-                cout << "Error: Opcode is not present in OPTAB" << endl;
+                cout << "\t\tError: Opcode is not present in OPTAB\n";
                 exit(0);
             }
         }
     }
+
+    sourceFile.close();
+
     ofstream symout(symtab_file_name.c_str());
     for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
     {
-        
         symout << it->first << " : " << decToHex((it->second).first) << endl;
     }
     symout.close();
-    sourceFile.close();
 }
 
 void assembleNewProgram()
