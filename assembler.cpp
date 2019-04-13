@@ -296,6 +296,7 @@ void Assembler::generateObjectCode()
                 if (SYMTAB[label].first == -1)
                 {
                     SYMTAB[label].first = LOCCTR;
+                    //TODO
                 }
                 else
                 {
@@ -380,7 +381,6 @@ void Assembler::generateObjectCode()
             }
             newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
-        cout<<newRecord<<endl;
     }
 
     sourceFile.close();
@@ -388,7 +388,7 @@ void Assembler::generateObjectCode()
     ofstream symout(symtab_file_name.c_str());
     for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
     {
-        symout << it->first << " : " << decToHex((it->second).first) << endl;
+        symout << it->first << "\t:\t" << decToHex((it->second).first) << endl;
     }
     symout.close();
 }
@@ -405,7 +405,7 @@ void assembleNewProgram()
     optab = "optab.txt";
     if (!fileExists(src) || !fileExists(optab))
     {
-        cout << "\n\t\t SOURCE FILE OR OPTAB DOESN'T EXISTS\n\n";
+        cout << "\n\t\t SOURCE FILE DOESN'T EXISTS\n\n";
         system("sleep 3");
         return;
     }
