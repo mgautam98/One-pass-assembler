@@ -202,7 +202,7 @@ void Assembler::populateOPTAB()
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
-
+    string label, opcode, operand;
     ifstream sourceFile(src_file_name.c_str());
 
     for (string line; getline(sourceFile, line);)
@@ -249,8 +249,67 @@ void Assembler::generateObjectCode()
         if (tokens[0].compare(".") == 0)
             continue;
 
-            
+        if (tokens.size() == 2)
+        {
+            opcode = tokens[0];
+            operand = tokens[1];
+        }
+        else if (tokens.size() == 3)
+        {
+            label = tokens[0];
+            opcode = tokens[1];
+            operand = tokens[2];
+        }
+        if (tokens.size() == 3)
+        {
+            if (SYMTAB.find(label) == SYMTAB.end())
+            {
+                SYMTAB.insert({label, pair<int, list<int>>(LOCCTR, {})});
+            }
+            else if (SYMTAB.find(label) != SYMTAB.end())
+            {
+                if (SYMTAB[label].first == 0)
+                {
+                    SYMTAB[label].first = LOCCTR;
+                }
+            }
+        }
+        if (OPTAB.find(opcode) != OPTAB.end())
+        {
+            LOCCTR += 3;
+        }
+        else
+        {
+            if (opcode.compare(string("WORD")) == 0)
+            {
+                LOCCTR += 3;
+            }
+            else if (opcode.compare(string("RESW")) == 0)
+            {
+                LOCCTR += 3 * (hexToDec(operand));
+            }
+            else if (opcode.compare(string("BYTE")) == 0)
+            {
+                LOCCTR += operand.length() - 3;
+            }
+            else if (opcode.compare(string("RESB")) == 0)
+            {
+                LOCCTR += hexToDec(operand);
+            }
+            else
+            {
+                cout << "Error: Opcode is not present in OPTAB" << endl;
+                exit(0);
+            }
+        }
     }
+    ofstream symout(symtab_file_name.c_str());
+    for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
+    {
+        
+        symout << it->first << " : " << decToHex((it->second).first) << endl;
+    }
+    symout.close();
     sourceFile.close();
 }
 
