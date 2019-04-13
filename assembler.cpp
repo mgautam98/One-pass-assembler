@@ -265,6 +265,7 @@ void Assembler::generateObjectCode()
                 first_executable_instruction = hexToDec(tokens[1]);
             else
                 first_executable_instruction = starting_address;
+            continue;
         }
 
         //comment line
@@ -308,9 +309,10 @@ void Assembler::generateObjectCode()
         string newRecord = "000000";
         bool indexRegister = false;
 
-        if(operand[operand.size()-1]=='X'){
+        if (operand[operand.size() - 1] == 'X')
+        {
             indexRegister = true;
-            operand = operand.substr(0, operand.size()-2);
+            operand = operand.substr(0, operand.size() - 2);
         }
 
         if (OPTAB.find(opcode) != OPTAB.end())
@@ -337,35 +339,48 @@ void Assembler::generateObjectCode()
         }
         else
         {
+            string constantValue = "";
+
             if (opcode.compare(string("WORD")) == 0)
             {
                 LOCCTR += 3;
+                constantValue += decToHex(stoi(operand));
             }
             else if (opcode.compare(string("RESW")) == 0)
             {
                 LOCCTR += 3 * stoi(operand);
+                continue;
             }
             else if (opcode.compare(string("BYTE")) == 0)
             {
                 if (operand[0] == 'X')
                 {
+                    constantValue += operand[2];
+                    constantValue + operand[3];
                     LOCCTR++;
                 }
                 else
                 {
+                    constantValue += decToHex((int)operand[2]);
+                    constantValue += decToHex((int)operand[3]);
+                    if (operand.size() == 6)
+                        constantValue += decToHex((int)operand[3]);
                     LOCCTR += operand.length() - 3;
                 }
             }
             else if (opcode.compare(string("RESB")) == 0)
             {
                 LOCCTR += stoi(operand);
+                continue;
             }
             else
             {
                 cout << "\t\tError: Opcode is not present in OPTAB\n";
                 exit(0);
             }
+            newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
+        cout<<newRecord<<endl;
     }
 
     sourceFile.close();

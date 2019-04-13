@@ -12,5 +12,6 @@ LOOP           ADD            TABLE,X
                RSUB
 TOTAL          RESW           1
 ZERO           WORD           0
-EOF            BYTE           'EOF'
+EOF            BYTE           C'EOF'
+INPUT          BYTE           X'F1'
                END
