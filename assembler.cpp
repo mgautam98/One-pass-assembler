@@ -224,7 +224,8 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-            program_name = tokens[0].substr(0, 6);
+
+            tokens[0] = tokens[0].substr(0, 6);
             program_name.replace(6 - tokens[0].size(), 6, tokens[0]);
 
             if (tokens.size() == 3)
