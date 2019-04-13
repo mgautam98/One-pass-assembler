@@ -202,7 +202,8 @@ void Assembler::populateOPTAB()
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
-    string label, opcode, operand;
+    string label, opcode,operand;
+    int OPERAND=0;
     ifstream sourceFile(src_file_name.c_str());
 
     for (string line; getline(sourceFile, line);)
@@ -260,6 +261,7 @@ void Assembler::generateObjectCode()
             opcode = tokens[1];
             operand = tokens[2];
         }
+        istringstream(operand) >> OPERAND;
         if (tokens.size() == 3)
         {
             if (SYMTAB.find(label) == SYMTAB.end())
@@ -286,7 +288,7 @@ void Assembler::generateObjectCode()
             }
             else if (opcode.compare(string("RESW")) == 0)
             {
-                LOCCTR += 3 * (hexToDec(operand));
+                LOCCTR += 3 * (OPERAND);
             }
             else if (opcode.compare(string("BYTE")) == 0)
             {
@@ -294,7 +296,7 @@ void Assembler::generateObjectCode()
             }
             else if (opcode.compare(string("RESB")) == 0)
             {
-                LOCCTR += hexToDec(operand);
+                LOCCTR += OPERAND;
             }
             else
             {
