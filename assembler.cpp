@@ -297,7 +297,7 @@ void Assembler::generateObjectCode()
             }
             else if (opcode.compare(string("RESW")) == 0)
             {
-                LOCCTR += 3 * (hexToDec(operand));
+                LOCCTR += 3 * stoi(operand);
             }
             else if (opcode.compare(string("BYTE")) == 0)
             {
@@ -312,7 +312,7 @@ void Assembler::generateObjectCode()
             }
             else if (opcode.compare(string("RESB")) == 0)
             {
-                LOCCTR += hexToDec(operand);
+                LOCCTR += stoi(operand);
             }
             else
             {
