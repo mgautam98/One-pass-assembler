@@ -34,7 +34,7 @@ class Assembler
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
-    map<int, vector<string>> records;
+    map<int, pair<int, vector<string>>> records;
     string src_file_name;
     string symtab_file_name;
     string optab_file_name;
@@ -139,6 +139,7 @@ vector<string> Assembler::tokenize(string str)
 
 Assembler::Assembler(string src, string optab, string symtab, string obj)
 {
+    program_name = "      ";
     src_file_name = src;
     symtab_file_name = symtab;
     optab_file_name = optab;
@@ -206,21 +207,7 @@ void Assembler::populateOPTAB()
 }
 void Assembler::addRecord(string rec)
 {
-    if (records[recordNo].size() >= 11)
-    {
-        recordNo++;
-    }
-    else
-    {
-        if (records[recordNo].size() == 0)
-        {
-            records[recordNo].push_back(decToHex(LOCCTR));
-        }
-        else
-        {
-            records[recordNo].push_back(rec);
-        }
-    }
+
     return;
 }
 void Assembler::generateObjectCode()
@@ -238,6 +225,7 @@ void Assembler::generateObjectCode()
         {
             firstLine = false;
             program_name = tokens[0].substr(0, 6);
+            program_name.replace(6 - tokens[0].size(), 6, tokens[0]);
 
             if (tokens.size() == 3)
             {
@@ -396,21 +384,21 @@ void Assembler::generateObjectCode()
     symout.close();
 
     ofstream objout(object_file_name.c_str());
-    objout << "H" << program_name << decToHex(starting_address) << decToHex(ending_address + 3) << endl;
+    objout << "H" << program_name << decToHex(starting_address) << decToHex(ending_address-starting_address + 3) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
-        if (records[i].size() == 0)
+        if (records[i].second.size() == 0)
             break;
-        objout << "T" << records[i][0] << decToHex(records[i].size());
-        for (int j = 1; j < records[i].size(); j++)
+        objout << "T" << (records[i].second)[0] << decToHex(records[i].first);
+        for (int j = 1; j < records[i].second.size(); j++)
         {
-            if (j != records[i].size() - 1)
-                objout << records[i][j];
+            if (j != records[i].second.size() - 1)
+                objout << (records[i].second)[j];
             else
-                objout << records[i][j] << endl;
+                objout << (records[i].second)[j] << endl;
         }
     }
-    objout << "E" << decToHex(starting_address) << endl;
+    objout << "E" << decToHex(first_executable_instruction) << endl;
     objout.close();
 }
 
