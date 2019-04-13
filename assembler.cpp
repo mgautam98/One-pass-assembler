@@ -34,7 +34,7 @@ class Assembler
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
-    map<int, pair<int, vector<string>>> records;
+    map<int, vector<string>> records;
     string src_file_name;
     string symtab_file_name;
     string optab_file_name;
@@ -46,6 +46,7 @@ class Assembler
     int ending_address;
     int first_executable_instruction;
     int LOCCTR;
+    int recordNo = 0;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
@@ -53,6 +54,7 @@ class Assembler
     void displayOptab();
     void displayObjectCode();
     void populateOPTAB();
+    void addRecord(string rec);
     void generateObjectCode();
     vector<string> tokenize(string str);
     int hexToDec(string s);
@@ -66,7 +68,7 @@ int Assembler::hexToDec(string s)
     int a;
     for (int i = 0; i < s.length(); i++)
     {
-        if(isdigit((char)s[i]))
+        if (isdigit((char)s[i]))
             a = s[i] - '0';
         if (s[i] == 'A')
             a = 10;
@@ -202,7 +204,25 @@ void Assembler::populateOPTAB()
     file.close();
     return;
 }
-
+void Assembler::addRecord(string rec)
+{
+    if (records[recordNo].size() >= 11)
+    {
+        recordNo++;
+    }
+    else
+    {
+        if (records[recordNo].size() == 0)
+        {
+            records[recordNo].push_back(decToHex(LOCCTR));
+        }
+        else
+        {
+            records[recordNo].push_back(rec);
+        }
+    }
+    return;
+}
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
@@ -318,6 +338,7 @@ void Assembler::generateObjectCode()
                 SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
                 SYMTAB[operand].second.push_back(LOCCTR);
             }
+            addRecord(newRecord);
             LOCCTR += 3;
         }
         else
@@ -373,6 +394,24 @@ void Assembler::generateObjectCode()
         symout << it->first << "\t:\t" << decToHex((it->second).first) << endl;
     }
     symout.close();
+
+    ofstream objout(object_file_name.c_str());
+    objout << "H" << program_name << decToHex(starting_address) << decToHex(ending_address + 3) << endl;
+    for (int i = 0; i <= recordNo; i++)
+    {
+        if (records[i].size() == 0)
+            break;
+        objout << "T" << records[i][0] << decToHex(records[i].size());
+        for (int j = 1; j < records[i].size(); j++)
+        {
+            if (j != records[i].size() - 1)
+                objout << records[i][j];
+            else
+                objout << records[i][j] << endl;
+        }
+    }
+    objout << "E" << decToHex(starting_address) << endl;
+    objout.close();
 }
 
 void assembleNewProgram()
