@@ -66,7 +66,7 @@ int Assembler::hexToDec(string s)
     int a;
     for (int i = 0; i < s.length(); i++)
     {
-        if(isdigit((char)s[i]))
+        if (isdigit((char)s[i]))
             a = s[i] - '0';
         if (s[i] == 'A')
             a = 10;
@@ -137,6 +137,7 @@ vector<string> Assembler::tokenize(string str)
 
 Assembler::Assembler(string src, string optab, string symtab, string obj)
 {
+    program_name = "      ";
     src_file_name = src;
     symtab_file_name = symtab;
     optab_file_name = optab;
@@ -217,7 +218,9 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-            program_name = tokens[0].substr(0, 6);
+
+            tokens[0] = tokens[0].substr(0, 6);
+            program_name.replace(6 - tokens[0].size(), 6, tokens[0]);
 
             if (tokens.size() == 3)
             {
