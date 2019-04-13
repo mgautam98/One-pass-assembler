@@ -46,6 +46,7 @@ class Assembler
     int ending_address;
     int first_executable_instruction;
     int LOCCTR;
+    int recordNo = 0;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
@@ -53,6 +54,7 @@ class Assembler
     void displayOptab();
     void displayObjectCode();
     void populateOPTAB();
+    void addRecord(string rec);
     void generateObjectCode();
     vector<string> tokenize(string str);
     int hexToDec(string s);
@@ -203,7 +205,11 @@ void Assembler::populateOPTAB()
     file.close();
     return;
 }
+void Assembler::addRecord(string rec)
+{
 
+    return;
+}
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
@@ -218,10 +224,9 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-
+            
             tokens[0] = tokens[0].substr(0, 6);
-            program_name.replace(6 - tokens[0].size(), 6, tokens[0]);
-
+            program_name.replace(tokens[0].size(), 6, tokens[0]);
             if (tokens.size() == 3)
             {
                 if (tokens[1].compare(string("START")) == 0)
@@ -321,6 +326,7 @@ void Assembler::generateObjectCode()
                 SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
                 SYMTAB[operand].second.push_back(LOCCTR);
             }
+            addRecord(newRecord);
             LOCCTR += 3;
         }
         else
@@ -376,6 +382,25 @@ void Assembler::generateObjectCode()
         symout << it->first << "\t:\t" << decToHex((it->second).first) << endl;
     }
     symout.close();
+
+    ofstream objout(object_file_name.c_str());
+    objout << "H" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address));
+    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
+    for (int i = 0; i <= recordNo; i++)
+    {
+        if (records[i].second.size() == 0)
+            break;
+        objout << "T" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first));
+        for (int j = 1; j < records[i].second.size(); j++)
+        {
+            if (j != records[i].second.size() - 1)
+                objout << (records[i].second)[j];
+            else
+                objout << (records[i].second)[j] << endl;
+        }
+    }
+    objout << "E" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
+    objout.close();
 }
 
 void assembleNewProgram()
