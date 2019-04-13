@@ -226,7 +226,7 @@ void Assembler::generateObjectCode()
             firstLine = false;
             
             tokens[0] = tokens[0].substr(0, 6);
-            program_name.replace(tokens[0].size(), 6, tokens[0]);
+            program_name.replace(0, tokens[0].size(), tokens[0]);
             if (tokens.size() == 3)
             {
                 if (tokens[1].compare(string("START")) == 0)
