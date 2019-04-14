@@ -34,6 +34,7 @@ class Assembler
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
+    map<int, string> objectCode;
     map<int, pair<int, vector<string>>> records;
     string src_file_name;
     string symtab_file_name;
@@ -219,7 +220,7 @@ void Assembler::generateObjectCode()
     for (string line; getline(sourceFile, line);)
     {
         vector<string> tokens = tokenize(line);
-
+        int location = LOCCTR;
         //For First line of program
         if (firstLine)
         {
@@ -286,7 +287,10 @@ void Assembler::generateObjectCode()
                 if (SYMTAB[label].first == -1)
                 {
                     SYMTAB[label].first = LOCCTR;
-                    //TODO
+                    
+                    for(auto i:SYMTAB[label].second){
+                        objectCode[i].replace(6 - decToHex(LOCCTR).size(), 6, decToHex(LOCCTR));
+                    }
                 }
                 else
                 {
@@ -372,8 +376,11 @@ void Assembler::generateObjectCode()
             }
             newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
+        objectCode[location] = newRecord;
     }
-
+    for(auto i:objectCode){
+        cout<<i.second<<endl;
+    }
     sourceFile.close();
 
     ofstream symout(symtab_file_name.c_str());
