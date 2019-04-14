@@ -412,12 +412,7 @@ void Assembler::generateObjectCode()
     {
         if (records[i].second.size() == 0)
             break;
-        // if (symtab.find())
-        // {
-        //     objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
-        //     objout << (records[i].second)[j] << endl;
-        // }
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first/2).size(), 2, decToHex(records[i].first/2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
