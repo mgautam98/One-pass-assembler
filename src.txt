@@ -1,17 +1,17 @@
 SUM            START          4000
+ZERO           WORD           0
+EOF            BYTE           C'EOF'
+INPUT          BYTE           X'F1'
+TABLE          RESW           100
+COUNT          RESW           1
+TOTAL          RESW           1
                JLT            LOOP
 FIRST          LDX            ZERO
                LDX            LOOP
 .   This is a comment line __
-TABLE          RESW           100
-COUNT          RESW           1
                LDA            ZERO
 LOOP           ADD            TABLE,X
                TIX            COUNT
                STA            TOTAL
                RSUB
-TOTAL          RESW           1
-ZERO           WORD           0
-EOF            BYTE           C'EOF'
-INPUT          BYTE           X'F1'
-               END
+               END            FIRST

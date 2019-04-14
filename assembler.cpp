@@ -401,10 +401,21 @@ void Assembler::generateObjectCode()
             newRecord.clear();
             newRecord = constantValue;
         }
+        if(indexRegister){
+            string temp = "";
+            temp += newRecord[2];
+            temp = decToHex(hexToDec(temp) | 8 );
+            newRecord[2] = temp[0];
+        }
         addRecord(newRecord, false);
     }
 
     sourceFile.close();
+
+    // for(auto i:records){
+    //     for(auto j : i.second.second) cout<<j<<" ";
+    //     cout<<endl;
+    // }
 
     ofstream symout(symtab_file_name.c_str());
     for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
@@ -419,7 +430,7 @@ void Assembler::generateObjectCode()
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
-            break;
+            continue;
         objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
