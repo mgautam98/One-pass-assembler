@@ -125,7 +125,7 @@ vector<string> Assembler::tokenize(string str)
             tokens.push_back(element);
             element.clear();
         }
-        else if (!(str[i] == ' ' || str[i]=='\t'))
+        else if (!(str[i] == ' ' || str[i] == '\t'))
         {
             element += string(1, str[i]);
         }
@@ -207,12 +207,11 @@ void Assembler::populateOPTAB()
 }
 void Assembler::addRecord(string rec, bool createNewTextRecord)
 {
-    
+
     if ((records[recordNo].first + (int)rec.size()) > 60 || createNewTextRecord)
     {
         recordNo++;
     }
-    cout<<records[recordNo].first<<endl;
     if (records[recordNo].second.size() == 0)
     {
         records[recordNo].second.push_back(decToHex(LOCCTR));
@@ -356,7 +355,8 @@ void Assembler::generateObjectCode()
             if (opcode.compare(string("WORD")) == 0)
             {
                 LOCCTR += 3;
-                constantValue += decToHex(stoi(operand));
+                string temp = decToHex(stoi(operand));
+                constantValue += string("000000").replace(6 - temp.size(), 6, temp);
             }
             else if (opcode.compare(string("RESW")) == 0)
             {
@@ -387,10 +387,11 @@ void Assembler::generateObjectCode()
             }
             else
             {
-                cout << "\t\tError: Opcode : "<<opcode<<" is not present in OPTAB\n";
+                cout << "\t\tError: Opcode : " << opcode << " is not present in OPTAB\n";
                 exit(0);
             }
-            newRecord.replace(6 - constantValue.size(), 6, constantValue);
+            newRecord.clear();
+            newRecord = constantValue;
         }
         addRecord(newRecord, false);
     }
@@ -416,7 +417,7 @@ void Assembler::generateObjectCode()
         //     objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
         //     objout << (records[i].second)[j] << endl;
         // }
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0])-3)) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
@@ -489,10 +490,10 @@ int main()
         else
         {
             system("clear");
-            cout<<"\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
-            cout<<"\t\t1. Assemble new program\n";
-            cout<<"\t\t2. Exit\n\n";
-            cout<<"\t\tEnter your choice\t:\t";
+            cout << "\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
+            cout << "\t\t1. Assemble new program\n";
+            cout << "\t\t2. Exit\n\n";
+            cout << "\t\tEnter your choice\t:\t";
         }
 
         cout << "\t\t\t\t\t";
