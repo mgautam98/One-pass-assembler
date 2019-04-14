@@ -54,7 +54,7 @@ class Assembler
     void displayOptab();
     void displayObjectCode();
     void populateOPTAB();
-    void addRecord(string rec);
+    void addRecord(string rec, bool createNewTextRecord);
     void generateObjectCode();
     vector<string> tokenize(string str);
     int hexToDec(string s);
@@ -205,24 +205,26 @@ void Assembler::populateOPTAB()
     file.close();
     return;
 }
-void Assembler::addRecord(string rec)
+void Assembler::addRecord(string rec, bool createNewTextRecord)
 {
+    
+    if ((records[recordNo].first + (int)rec.size()) > 60 || createNewTextRecord)
+    {
+        recordNo++;
+    }
+    cout<<records[recordNo].first<<endl;
     if (records[recordNo].second.size() == 0)
     {
         records[recordNo].second.push_back(decToHex(LOCCTR));
         records[recordNo].second.push_back(rec);
-        records[recordNo].first += records[recordNo].second.size();
+        records[recordNo].first += (int)rec.size();
     }
     else
     {
         records[recordNo].second.push_back(rec);
-        records[recordNo].first += records[recordNo].second.size();
+        records[recordNo].first += (int)rec.size();
     }
 
-    if (records[recordNo].second.size() % 11 == 0)
-    {
-        recordNo++;
-    }
     return;
 }
 void Assembler::generateObjectCode()
@@ -235,10 +237,6 @@ void Assembler::generateObjectCode()
     {
         vector<string> tokens = tokenize(line);
         int location = LOCCTR;
-        for(auto i:tokens){
-            cout<<"->"<<i;
-        }
-        cout<<endl;
 
         //For First line of program
         if (firstLine)
@@ -394,8 +392,7 @@ void Assembler::generateObjectCode()
             }
             newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
-        cout<<newRecord<<endl;
-        addRecord(newRecord);
+        addRecord(newRecord, false);
     }
 
     sourceFile.close();
