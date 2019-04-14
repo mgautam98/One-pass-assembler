@@ -46,7 +46,7 @@ class Assembler
     int ending_address;
     int first_executable_instruction;
     int LOCCTR;
-    int recordNo = 0;
+    int recordNo;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
@@ -86,6 +86,7 @@ int Assembler::hexToDec(string s)
     }
     return dval;
 }
+
 string Assembler::decToHex(int a)
 {
     string hexlist = "0123456789ABCDEF";
@@ -109,7 +110,9 @@ string Assembler::hexToBin(string s)
         else
             n = 10 + i - 'A';
         for (int j = 3; j >= 0; --j)
+        {
             htb.push_back((n & (1 << j)) ? '1' : '0');
+        }
     }
     return htb;
 }
@@ -140,6 +143,7 @@ vector<string> Assembler::tokenize(string str)
 Assembler::Assembler(string src, string optab, string symtab, string obj)
 {
     program_name = "      ";
+    recordNo = 0;
     src_file_name = src;
     symtab_file_name = symtab;
     optab_file_name = optab;
@@ -205,6 +209,7 @@ void Assembler::populateOPTAB()
     file.close();
     return;
 }
+
 void Assembler::addRecord(string rec, bool createNewTextRecord)
 {
 
@@ -233,6 +238,7 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
     // cout<<recordNo<<endl;
     return;
 }
+
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
@@ -272,7 +278,6 @@ void Assembler::generateObjectCode()
             continue;
         }
 
-
         //FOR Last line of program
         if (tokens[0].compare("END") == 0)
         {
@@ -295,8 +300,9 @@ void Assembler::generateObjectCode()
         }
 
         //comment line
-        if (tokens[0].compare(".") == 0)
+        if (tokens[0].compare(".") == 0){
             continue;
+        }
 
         if (tokens.size() == 2)
         {
@@ -395,8 +401,9 @@ void Assembler::generateObjectCode()
                 {
                     constantValue += decToHex((int)operand[2]);
                     constantValue += decToHex((int)operand[3]);
-                    if (operand.size() == 6)
+                    if (operand.size() == 6){
                         constantValue += decToHex((int)operand[3]);
+                    }
                     LOCCTR += operand.length() - 3;
                 }
             }
@@ -438,12 +445,15 @@ void Assembler::generateObjectCode()
     symout.close();
 
     ofstream objout(object_file_name.c_str());
-    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address))<<"^";
+    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
     objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
+        {
             continue;
+        }
+
         objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
@@ -506,7 +516,9 @@ void assembleNewProgram()
 int main()
 {
     if (!OS_Windows)
+    {
         system("chmod +x menu.sh");
+    }
 
     int inp;
 
