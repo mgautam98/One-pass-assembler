@@ -34,7 +34,6 @@ class Assembler
   private:
     map<string, string> OPTAB;
     map<string, pair<int, list<int>>> SYMTAB;
-    map<int, string> objectCode;
     map<int, pair<int, vector<string>>> records;
     string src_file_name;
     string symtab_file_name;
@@ -121,12 +120,12 @@ vector<string> Assembler::tokenize(string str)
     string element;
     for (int i = 0; i < str.length(); i++)
     {
-        if (str[i] == ' ' && element.length() != 0)
+        if ((str[i] == ' ' || str[i] == '\t') && element.length() != 0)
         {
             tokens.push_back(element);
             element.clear();
         }
-        else if (str[i] != ' ')
+        else if (!(str[i] == ' ' || str[i]=='\t'))
         {
             element += string(1, str[i]);
         }
@@ -236,6 +235,11 @@ void Assembler::generateObjectCode()
     {
         vector<string> tokens = tokenize(line);
         int location = LOCCTR;
+        for(auto i:tokens){
+            cout<<"->"<<i;
+        }
+        cout<<endl;
+
         //For First line of program
         if (firstLine)
         {
@@ -303,10 +307,9 @@ void Assembler::generateObjectCode()
                 {
                     SYMTAB[label].first = LOCCTR;
 
-                    // for (auto i : SYMTAB[label].second)
-                    // {
-                    //     objectCode[i].replace(6 - decToHex(LOCCTR).size(), 6, decToHex(LOCCTR));
-                    // }
+                    for (auto i : SYMTAB[label].second)
+                    {
+                    }
                 }
                 else
                 {
@@ -386,19 +389,15 @@ void Assembler::generateObjectCode()
             }
             else
             {
-                cout << "\t\tError: Opcode is not present in OPTAB\n";
+                cout << "\t\tError: Opcode : "<<opcode<<" is not present in OPTAB\n";
                 exit(0);
             }
             newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
-        objectCode[location] = newRecord;
+        cout<<newRecord<<endl;
         addRecord(newRecord);
-        cout << newRecord << endl;
     }
-    // for (auto i : objectCode)
-    // {
-    //     cout << i.second << endl;
-    // }
+
     sourceFile.close();
 
     ofstream symout(symtab_file_name.c_str());
@@ -493,10 +492,10 @@ int main()
         else
         {
             system("clear");
-            cout << "\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
-            cout << "\t\t1. Assemble new program\n";
-            cout << "\t\t2. Exit\n\n";
-            cout << "\t\tEnter your choice\t:\t";
+            cout<<"\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
+            cout<<"\t\t1. Assemble new program\n";
+            cout<<"\t\t2. Exit\n\n";
+            cout<<"\t\tEnter your choice\t:\t";
         }
 
         cout << "\t\t\t\t\t";
