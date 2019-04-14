@@ -225,7 +225,7 @@ void Assembler::generateObjectCode()
         if (firstLine)
         {
             firstLine = false;
-            
+
             tokens[0] = tokens[0].substr(0, 6);
             program_name.replace(0, tokens[0].size(), tokens[0]);
             if (tokens.size() == 3)
@@ -287,8 +287,9 @@ void Assembler::generateObjectCode()
                 if (SYMTAB[label].first == -1)
                 {
                     SYMTAB[label].first = LOCCTR;
-                    
-                    for(auto i:SYMTAB[label].second){
+
+                    for (auto i : SYMTAB[label].second)
+                    {
                         objectCode[i].replace(6 - decToHex(LOCCTR).size(), 6, decToHex(LOCCTR));
                     }
                 }
@@ -378,8 +379,9 @@ void Assembler::generateObjectCode()
         }
         objectCode[location] = newRecord;
     }
-    for(auto i:objectCode){
-        cout<<i.second<<endl;
+    for (auto i : objectCode)
+    {
+        cout << i.second << endl;
     }
     sourceFile.close();
 
@@ -458,12 +460,23 @@ void assembleNewProgram()
 
 int main()
 {
-    system("chmod +x menu.sh");
+    if (!OS_Windows)
+        system("chmod +x menu.sh");
+
     int inp;
 
     while (1)
     {
-        system("./menu.sh");
+        if (!OS_Windows)
+            system("./menu.sh");
+        else
+        {
+            system("clear");
+            cout<<"\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
+            cout<<'\t\t1. Assemble new program\n';
+            cout<<"\t\t2. Exit\n\n";
+            cout<<"\t\tEnter your choice\t:\t";
+        }
 
         cout << "\t\t\t\t\t";
         cin >> inp;
