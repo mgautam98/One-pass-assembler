@@ -271,12 +271,24 @@ void Assembler::generateObjectCode()
             }
             continue;
         }
+
+
         //FOR Last line of program
         if (tokens[0].compare("END") == 0)
         {
             ending_address = LOCCTR;
+
             if (tokens.size() > 1)
-                first_executable_instruction = hexToDec(tokens[1]);
+            {
+                if (SYMTAB.find(tokens[1]) != SYMTAB.end())
+                {
+                    first_executable_instruction = SYMTAB[tokens[1]].first;
+                }
+                else
+                {
+                    cout << "\n\t\tUndefined Label : " << tokens[1] << endl;
+                }
+            }
             else
                 first_executable_instruction = starting_address;
             continue;
@@ -401,10 +413,11 @@ void Assembler::generateObjectCode()
             newRecord.clear();
             newRecord = constantValue;
         }
-        if(indexRegister){
+        if (indexRegister)
+        {
             string temp = "";
             temp += newRecord[2];
-            temp = decToHex(hexToDec(temp) | 8 );
+            temp = decToHex(hexToDec(temp) | 8);
             newRecord[2] = temp[0];
         }
         addRecord(newRecord, false);
@@ -425,7 +438,7 @@ void Assembler::generateObjectCode()
     symout.close();
 
     ofstream objout(object_file_name.c_str());
-    objout << "H" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address));
+    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address))<<"^";
     objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
@@ -440,7 +453,7 @@ void Assembler::generateObjectCode()
                 objout << (records[i].second)[j] << endl;
         }
     }
-    objout << "E" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
+    objout << "E^" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
     objout.close();
 }
 
