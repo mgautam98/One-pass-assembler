@@ -207,7 +207,22 @@ void Assembler::populateOPTAB()
 }
 void Assembler::addRecord(string rec)
 {
+    if (records[recordNo].second.size() == 0)
+    {
+        records[recordNo].second.push_back(decToHex(LOCCTR));
+        records[recordNo].second.push_back(rec);
+        records[recordNo].first += records[recordNo].second.size();
+    }
+    else
+    {
+        records[recordNo].second.push_back(rec);
+        records[recordNo].first += records[recordNo].second.size();
+    }
 
+    if (records[recordNo].second.size() % 11 == 0)
+    {
+        recordNo++;
+    }
     return;
 }
 void Assembler::generateObjectCode()
@@ -334,7 +349,6 @@ void Assembler::generateObjectCode()
                 SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
                 SYMTAB[operand].second.push_back(LOCCTR);
             }
-            addRecord(newRecord);
             LOCCTR += 3;
         }
         else
@@ -381,6 +395,7 @@ void Assembler::generateObjectCode()
             newRecord.replace(6 - constantValue.size(), 6, constantValue);
         }
         cout<<newRecord<<endl;
+        addRecord(newRecord);
     }
 
     sourceFile.close();
@@ -399,11 +414,16 @@ void Assembler::generateObjectCode()
     {
         if (records[i].second.size() == 0)
             break;
-        objout << "T" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first));
+        // if (symtab.find())
+        // {
+        //     objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
+        //     objout << (records[i].second)[j] << endl;
+        // }
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0])-3)) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
-                objout << (records[i].second)[j];
+                objout << (records[i].second)[j] << "^";
             else
                 objout << (records[i].second)[j] << endl;
         }
