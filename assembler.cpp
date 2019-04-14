@@ -212,18 +212,25 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
     {
         recordNo++;
     }
+    if (createNewTextRecord)
+    {
+        int locationToUpdate = hexToDec(rec) + 1;
+        records[recordNo].second.push_back(decToHex(locationToUpdate));
+        //need to handle X register here
+        records[recordNo].second.push_back(decToHex(LOCCTR));
+        records[recordNo].first += (int)decToHex(LOCCTR).size();
+        recordNo++;
+        return;
+    }
+
     if (records[recordNo].second.size() == 0)
     {
         records[recordNo].second.push_back(decToHex(LOCCTR));
-        records[recordNo].second.push_back(rec);
-        records[recordNo].first += (int)rec.size();
+        records[recordNo].first = 0;
     }
-    else
-    {
-        records[recordNo].second.push_back(rec);
-        records[recordNo].first += (int)rec.size();
-    }
-
+    records[recordNo].second.push_back(rec);
+    records[recordNo].first += (int)rec.size();
+    // cout<<recordNo<<endl;
     return;
 }
 void Assembler::generateObjectCode()
@@ -306,6 +313,7 @@ void Assembler::generateObjectCode()
 
                     for (auto i : SYMTAB[label].second)
                     {
+                        addRecord(decToHex(i), true);
                     }
                 }
                 else
@@ -412,7 +420,7 @@ void Assembler::generateObjectCode()
     {
         if (records[i].second.size() == 0)
             break;
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first/2).size(), 2, decToHex(records[i].first/2)) << "^";
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
