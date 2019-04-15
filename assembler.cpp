@@ -46,7 +46,7 @@ class Assembler
     int ending_address;
     int first_executable_instruction;
     int LOCCTR;
-    int recordNo = 0;
+    int recordNo;
 
   public:
     Assembler(string src, string optab, string symtab, string obj);
@@ -54,7 +54,7 @@ class Assembler
     void displayOptab();
     void displayObjectCode();
     void populateOPTAB();
-    void addRecord(string rec);
+    void addRecord(string rec, bool createNewTextRecord);
     void generateObjectCode();
     vector<string> tokenize(string str);
     int hexToDec(string s);
@@ -86,6 +86,7 @@ int Assembler::hexToDec(string s)
     }
     return dval;
 }
+
 string Assembler::decToHex(int a)
 {
     string hexlist = "0123456789ABCDEF";
@@ -109,7 +110,9 @@ string Assembler::hexToBin(string s)
         else
             n = 10 + i - 'A';
         for (int j = 3; j >= 0; --j)
+        {
             htb.push_back((n & (1 << j)) ? '1' : '0');
+        }
     }
     return htb;
 }
@@ -125,7 +128,7 @@ vector<string> Assembler::tokenize(string str)
             tokens.push_back(element);
             element.clear();
         }
-        else if (!(str[i] == ' ' || str[i]=='\t'))
+        else if (!(str[i] == ' ' || str[i] == '\t'))
         {
             element += string(1, str[i]);
         }
@@ -140,6 +143,7 @@ vector<string> Assembler::tokenize(string str)
 Assembler::Assembler(string src, string optab, string symtab, string obj)
 {
     program_name = "      ";
+    recordNo = 0;
     src_file_name = src;
     symtab_file_name = symtab;
     optab_file_name = optab;
@@ -205,26 +209,36 @@ void Assembler::populateOPTAB()
     file.close();
     return;
 }
-void Assembler::addRecord(string rec)
-{
-    if (records[recordNo].second.size() == 0)
-    {
-        records[recordNo].second.push_back(decToHex(LOCCTR));
-        records[recordNo].second.push_back(rec);
-        records[recordNo].first += records[recordNo].second.size();
-    }
-    else
-    {
-        records[recordNo].second.push_back(rec);
-        records[recordNo].first += records[recordNo].second.size();
-    }
 
-    if (records[recordNo].second.size() % 11 == 0)
+void Assembler::addRecord(string rec, bool createNewTextRecord)
+{
+
+    if ((records[recordNo].first + (int)rec.size()) > 60 || createNewTextRecord)
     {
         recordNo++;
     }
+    if (createNewTextRecord)
+    {
+        int locationToUpdate = hexToDec(rec) + 1;
+        records[recordNo].second.push_back(decToHex(locationToUpdate));
+        //need to handle X register here
+        records[recordNo].second.push_back(decToHex(LOCCTR));
+        records[recordNo].first += (int)decToHex(LOCCTR).size();
+        recordNo++;
+        return;
+    }
+
+    if (records[recordNo].second.size() == 0)
+    {
+        records[recordNo].second.push_back(decToHex(LOCCTR));
+        records[recordNo].first = 0;
+    }
+    records[recordNo].second.push_back(rec);
+    records[recordNo].first += (int)rec.size();
+    // cout<<recordNo<<endl;
     return;
 }
+
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
@@ -235,10 +249,6 @@ void Assembler::generateObjectCode()
     {
         vector<string> tokens = tokenize(line);
         int location = LOCCTR;
-        for(auto i:tokens){
-            cout<<"->"<<i;
-        }
-        cout<<endl;
 
         //For First line of program
         if (firstLine)
@@ -267,20 +277,32 @@ void Assembler::generateObjectCode()
             }
             continue;
         }
+
         //FOR Last line of program
         if (tokens[0].compare("END") == 0)
         {
             ending_address = LOCCTR;
+
             if (tokens.size() > 1)
-                first_executable_instruction = hexToDec(tokens[1]);
+            {
+                if (SYMTAB.find(tokens[1]) != SYMTAB.end())
+                {
+                    first_executable_instruction = SYMTAB[tokens[1]].first;
+                }
+                else
+                {
+                    cout << "\n\t\tUndefined Label : " << tokens[1] << endl;
+                }
+            }
             else
                 first_executable_instruction = starting_address;
             continue;
         }
 
         //comment line
-        if (tokens[0].compare(".") == 0)
+        if (tokens[0].compare(".") == 0){
             continue;
+        }
 
         if (tokens.size() == 2)
         {
@@ -309,6 +331,7 @@ void Assembler::generateObjectCode()
 
                     for (auto i : SYMTAB[label].second)
                     {
+                        addRecord(decToHex(i), true);
                     }
                 }
                 else
@@ -358,7 +381,8 @@ void Assembler::generateObjectCode()
             if (opcode.compare(string("WORD")) == 0)
             {
                 LOCCTR += 3;
-                constantValue += decToHex(stoi(operand));
+                string temp = decToHex(stoi(operand));
+                constantValue += string("000000").replace(6 - temp.size(), 6, temp);
             }
             else if (opcode.compare(string("RESW")) == 0)
             {
@@ -377,8 +401,9 @@ void Assembler::generateObjectCode()
                 {
                     constantValue += decToHex((int)operand[2]);
                     constantValue += decToHex((int)operand[3]);
-                    if (operand.size() == 6)
+                    if (operand.size() == 6){
                         constantValue += decToHex((int)operand[3]);
+                    }
                     LOCCTR += operand.length() - 3;
                 }
             }
@@ -389,16 +414,28 @@ void Assembler::generateObjectCode()
             }
             else
             {
-                cout << "\t\tError: Opcode : "<<opcode<<" is not present in OPTAB\n";
+                cout << "\t\tError: Opcode : " << opcode << " is not present in OPTAB\n";
                 exit(0);
             }
-            newRecord.replace(6 - constantValue.size(), 6, constantValue);
+            newRecord.clear();
+            newRecord = constantValue;
         }
-        cout<<newRecord<<endl;
-        addRecord(newRecord);
+        if (indexRegister)
+        {
+            string temp = "";
+            temp += newRecord[2];
+            temp = decToHex(hexToDec(temp) | 8);
+            newRecord[2] = temp[0];
+        }
+        addRecord(newRecord, false);
     }
 
     sourceFile.close();
+
+    // for(auto i:records){
+    //     for(auto j : i.second.second) cout<<j<<" ";
+    //     cout<<endl;
+    // }
 
     ofstream symout(symtab_file_name.c_str());
     for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
@@ -408,18 +445,16 @@ void Assembler::generateObjectCode()
     symout.close();
 
     ofstream objout(object_file_name.c_str());
-    objout << "H" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address));
+    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
     objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
-            break;
-        // if (symtab.find())
-        // {
-        //     objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
-        //     objout << (records[i].second)[j] << endl;
-        // }
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0])-3)) << "^" << string("00").replace(2 - decToHex(records[i].first).size(), 2, decToHex(records[i].first)) << "^";
+        {
+            continue;
+        }
+
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
@@ -428,7 +463,7 @@ void Assembler::generateObjectCode()
                 objout << (records[i].second)[j] << endl;
         }
     }
-    objout << "E" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
+    objout << "E^" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
     objout.close();
 }
 
@@ -481,7 +516,9 @@ void assembleNewProgram()
 int main()
 {
     if (!OS_Windows)
+    {
         system("chmod +x menu.sh");
+    }
 
     int inp;
 
@@ -492,10 +529,10 @@ int main()
         else
         {
             system("clear");
-            cout<<"\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
-            cout<<"\t\t1. Assemble new program\n";
-            cout<<"\t\t2. Exit\n\n";
-            cout<<"\t\tEnter your choice\t:\t";
+            cout << "\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
+            cout << "\t\t1. Assemble new program\n";
+            cout << "\t\t2. Exit\n\n";
+            cout << "\t\tEnter your choice\t:\t";
         }
 
         cout << "\t\t\t\t\t";
