@@ -300,10 +300,10 @@ void Assembler::generateObjectCode()
         }
 
         //comment line
-        if (tokens[0].compare(".") == 0){
+        if (tokens[0].compare(".") == 0)
+        {
             continue;
         }
-
         if (tokens.size() == 2)
         {
             opcode = tokens[0];
@@ -345,7 +345,12 @@ void Assembler::generateObjectCode()
         //handling opcode
         string newRecord = "000000";
         bool indexRegister = false;
-
+        if (tokens.size() == 1)
+        {
+            opcode = tokens[0];
+            recordNo++;
+            continue;
+        }
         if (operand[operand.size() - 1] == 'X')
         {
             indexRegister = true;
@@ -402,7 +407,8 @@ void Assembler::generateObjectCode()
                 {
                     constantValue += decToHex((int)operand[2]);
                     constantValue += decToHex((int)operand[3]);
-                    if (operand.size() == 6){
+                    if (operand.size() == 6)
+                    {
                         constantValue += decToHex((int)operand[3]);
                     }
                     LOCCTR += operand.length() - 3;
@@ -448,15 +454,14 @@ void Assembler::generateObjectCode()
 
     ofstream objout(object_file_name.c_str());
     objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
-    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
+    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
         {
             continue;
         }
-
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, decToHex(hexToDec((records[i].second)[0]) - 3)) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
         for (int j = 1; j < records[i].second.size(); j++)
         {
             if (j != records[i].second.size() - 1)
