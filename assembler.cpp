@@ -219,14 +219,11 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
     }
     if (createNewTextRecord)
     {
-        if (rec != "")
-        {
-            int locationToUpdate = hexToDec(rec) + 3;
-            records[recordNo].second.push_back(decToHex(locationToUpdate));
-            //need to handle X register here
-            records[recordNo].second.push_back(decToHex(LOCCTR));
-            records[recordNo].first += (int)decToHex(LOCCTR).size();
-        }
+        int locationToUpdate = hexToDec(rec) + 3;
+        records[recordNo].second.push_back(decToHex(locationToUpdate));
+        //need to handle X register here
+        records[recordNo].second.push_back(decToHex(LOCCTR));
+        records[recordNo].first += (int)decToHex(LOCCTR).size();
         recordNo++;
         return;
     }
@@ -348,10 +345,10 @@ void Assembler::generateObjectCode()
         //handling opcode
         string newRecord = "000000";
         bool indexRegister = false;
-        if(tokens.size() == 1){
+        if (tokens.size() == 1)
+        {
             opcode = tokens[0];
-            newRecord.replace(0, 2, OPTAB[opcode]);
-            addRecord(newRecord,false);
+            recordNo++;
             continue;
         }
         if (operand[operand.size() - 1] == 'X')
@@ -395,8 +392,7 @@ void Assembler::generateObjectCode()
             else if (opcode.compare(string("RESW")) == 0)
             {
                 LOCCTR += 3 * stoi(operand);
-                constantValue += "";
-                addRecord(constantValue, true);
+                recordNo++;
                 continue;
             }
             else if (opcode.compare(string("BYTE")) == 0)
@@ -421,8 +417,12 @@ void Assembler::generateObjectCode()
             else if (opcode.compare(string("RESB")) == 0)
             {
                 LOCCTR += stoi(operand);
+<<<<<<< HEAD
+                recordNo++;
+=======
                 constantValue += "";
                 addRecord(constantValue, true);
+>>>>>>> 3527abf08f39fb9e197d04a718f3e84c70a6d865
                 continue;
             }
             else
