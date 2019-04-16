@@ -219,7 +219,7 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
     }
     if (createNewTextRecord)
     {
-        int locationToUpdate = hexToDec(rec) + 3;
+        int locationToUpdate = hexToDec(rec) + 1;
         records[recordNo].second.push_back(decToHex(locationToUpdate));
         //need to handle X register here
         records[recordNo].second.push_back(decToHex(LOCCTR));
