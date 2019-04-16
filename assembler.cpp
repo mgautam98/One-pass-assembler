@@ -212,11 +212,13 @@ void Assembler::populateOPTAB()
 
 void Assembler::addRecord(string rec, bool createNewTextRecord)
 {
+    bool isEmpty = records.find(recordNo) == records.end();
 
-    if ((records[recordNo].first + (int)rec.size()) > 60 || createNewTextRecord)
+    if (((records[recordNo].first + (int)rec.size()) > 60 || createNewTextRecord) && !isEmpty)
     {
         recordNo++;
     }
+
     if (createNewTextRecord)
     {
         int locationToUpdate = hexToDec(rec) + 1;
@@ -304,6 +306,11 @@ void Assembler::generateObjectCode()
         {
             continue;
         }
+
+        if (tokens.size() == 1)
+        {
+            opcode = tokens[0];
+        }
         if (tokens.size() == 2)
         {
             opcode = tokens[0];
@@ -342,16 +349,10 @@ void Assembler::generateObjectCode()
             }
         }
 
-        //handling opcode
         string newRecord = "000000";
+
+        //handling opcode
         bool indexRegister = false;
-        if (tokens.size() == 1)
-        {
-            opcode = tokens[0];
-            newRecord.replace(0, 2, OPTAB[opcode]);
-            addRecord(newRecord, false);
-            continue;
-        }
         if (operand[operand.size() - 1] == 'X')
         {
             indexRegister = true;
@@ -361,32 +362,46 @@ void Assembler::generateObjectCode()
         if (OPTAB.find(opcode) != OPTAB.end())
         {
             newRecord.replace(0, 2, OPTAB[opcode]);
-            if (SYMTAB.find(operand) != SYMTAB.end())
+            if (tokens.size() > 1)
             {
-                if (SYMTAB[operand].first != -1)
+                if (SYMTAB.find(operand) != SYMTAB.end())
                 {
-                    string addressFeild = decToHex(SYMTAB[operand].first);
-                    newRecord.replace(6 - addressFeild.size(), 6, addressFeild);
+                    if (SYMTAB[operand].first != -1)
+                    {
+                        string addressFeild = decToHex(SYMTAB[operand].first);
+                        newRecord.replace(6 - addressFeild.size(), 6, addressFeild);
+                    }
+                    else
+                    {
+                        SYMTAB[operand].second.push_back(LOCCTR);
+                    }
                 }
                 else
                 {
+                    SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
                     SYMTAB[operand].second.push_back(LOCCTR);
                 }
             }
-            else
+
+            if (indexRegister)
             {
-                SYMTAB.insert({operand, pair<int, list<int>>(-1, {})});
-                SYMTAB[operand].second.push_back(LOCCTR);
+                string temp = "";
+                temp += newRecord[2];
+                temp = decToHex(hexToDec(temp) | 8);
+                newRecord[2] = temp[0];
             }
+
+            addRecord(newRecord, false);
             LOCCTR += 3;
         }
         else
         {
             string constantValue = "";
+            int newLocation = LOCCTR;
 
             if (opcode.compare(string("WORD")) == 0)
             {
-                LOCCTR += 3;
+                newLocation += 3;
                 string temp = decToHex(stoi(operand));
                 constantValue += string("000000").replace(6 - temp.size(), 6, temp);
             }
@@ -402,7 +417,7 @@ void Assembler::generateObjectCode()
                 {
                     constantValue += operand[2];
                     constantValue += operand[3];
-                    LOCCTR++;
+                    newLocation++;
                 }
                 else
                 {
@@ -412,7 +427,7 @@ void Assembler::generateObjectCode()
                     {
                         constantValue += decToHex((int)operand[3]);
                     }
-                    LOCCTR += operand.length() - 3;
+                    newLocation += operand.length() - 3;
                 }
             }
             else if (opcode.compare(string("RESB")) == 0)
@@ -428,22 +443,26 @@ void Assembler::generateObjectCode()
             }
             newRecord.clear();
             newRecord = constantValue;
+            if (indexRegister)
+            {
+                string temp = "";
+                temp += newRecord[2];
+                temp = decToHex(hexToDec(temp) | 8);
+                newRecord[2] = temp[0];
+            }
+            addRecord(newRecord, false);
+            LOCCTR = newLocation;
         }
-        if (indexRegister)
-        {
-            string temp = "";
-            temp += newRecord[2];
-            temp = decToHex(hexToDec(temp) | 8);
-            newRecord[2] = temp[0];
-        }
-        addRecord(newRecord, false);
     }
 
     sourceFile.close();
 
-    // for(auto i:records){
-    //     for(auto j : i.second.second) cout<<j<<" ";
-    //     cout<<endl;
+    // for (auto i : records)
+    // {
+    //     cout << i.first << "->";
+    //     for (auto j : i.second.second)
+    //         cout << j << " ";
+    //     cout << endl;
     // }
 
     ofstream symout(symtab_file_name.c_str());
@@ -455,7 +474,7 @@ void Assembler::generateObjectCode()
 
     ofstream objout(object_file_name.c_str());
     objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
-    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address + 3)) << endl;
+    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address)) << endl;
     for (int i = 0; i <= recordNo; i++)
     {
         if (records[i].second.size() == 0)
