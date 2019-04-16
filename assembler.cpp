@@ -348,7 +348,8 @@ void Assembler::generateObjectCode()
         if (tokens.size() == 1)
         {
             opcode = tokens[0];
-            recordNo++;
+            newRecord.replace(0, 2, OPTAB[opcode]);
+            addRecord(newRecord, false);
             continue;
         }
         if (operand[operand.size() - 1] == 'X')
