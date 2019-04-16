@@ -417,12 +417,7 @@ void Assembler::generateObjectCode()
             else if (opcode.compare(string("RESB")) == 0)
             {
                 LOCCTR += stoi(operand);
-<<<<<<< HEAD
                 recordNo++;
-=======
-                constantValue += "";
-                addRecord(constantValue, true);
->>>>>>> 3527abf08f39fb9e197d04a718f3e84c70a6d865
                 continue;
             }
             else
