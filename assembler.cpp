@@ -457,13 +457,13 @@ void Assembler::generateObjectCode()
 
     sourceFile.close();
 
-    for (auto i : records)
-    {
-        cout << i.first << "->";
-        for (auto j : i.second.second)
-            cout << j << " ";
-        cout << endl;
-    }
+    // for (auto i : records)
+    // {
+    //     cout << i.first << "->";
+    //     for (auto j : i.second.second)
+    //         cout << j << " ";
+    //     cout << endl;
+    // }
 
     ofstream symout(symtab_file_name.c_str());
     for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
