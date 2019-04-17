@@ -511,14 +511,25 @@ void assembleNewProgram()
         return;
     }
     Assembler newProgram(src, optab, symtab, object);
+    system("clear");
     while (1)
     {
-        cout << "\n\n\t\t1. Display source code\n";
-        cout << "\t\t2. Display OPTAB\n";
-        cout << "\t\t3. Display object code\n";
-        cout << "\t\t4. Return to Main\n";
-        cout << " \n\t\tEnter your choice : ";
+        if (!OS_Windows)
+        {
+            system("chmod +x assemblerMenu.sh");
+            system("./assemblerMenu.sh");
+        }
+        else
+        {
+            cout << "\n\n\t\t1. Display source code\n";
+            cout << "\t\t2. Display OPTAB\n";
+            cout << "\t\t3. Display object code\n";
+            cout << "\t\t4. Return to Main\n";
+            cout << " \n\t\tEnter your choice : ";
+        }
+        cout << "\t\t\t\t\t";
         cin >> inp;
+        cout<<inp<<endl;
         if (inp == 4)
             break;
         switch (inp)
@@ -542,17 +553,16 @@ void assembleNewProgram()
 
 int main()
 {
-    if (!OS_Windows)
-    {
-        system("chmod +x menu.sh");
-    }
 
     int inp;
 
     while (1)
     {
         if (!OS_Windows)
+        {
+            system("chmod +x menu.sh");
             system("./menu.sh");
+        }
         else
         {
             system("clear");
