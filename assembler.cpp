@@ -63,6 +63,8 @@ class Assembler
     void populateOPTAB();
     void addRecord(string rec, bool createNewTextRecord);
     void generateObjectCode();
+    void writeSYMTABFile();
+    void writeObjectFile();
     vector<string> tokenize(string str);
     int hexToDec(string s);
     string decToHex(int a);
@@ -197,6 +199,40 @@ void Assembler::displayObjectCode()
     return;
 }
 
+void Assembler::writeSYMTABFile()
+{
+    ofstream symout(symtab_file_name.c_str());
+    for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
+    {
+        symout << it->first << "\t:\t" << decToHex((it->second).first) << endl;
+    }
+    symout.close();
+}
+
+void Assembler::writeObjectFile()
+{
+    ofstream objout(object_file_name.c_str());
+    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
+    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address)) << endl;
+    for (int i = 0; i <= recordNo; i++)
+    {
+        if (records[i].second.size() == 0)
+        {
+            continue;
+        }
+        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
+        for (int j = 1; j < records[i].second.size(); j++)
+        {
+            if (j != records[i].second.size() - 1)
+                objout << (records[i].second)[j] << "^";
+            else
+                objout << (records[i].second)[j] << endl;
+        }
+    }
+    objout << "E^" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
+    objout.close();
+}
+
 void Assembler::populateOPTAB()
 {
     ifstream file(optab_file_name.c_str());
@@ -230,7 +266,6 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
     {
         int locationToUpdate = hexToDec(rec) + 1;
         records[recordNo].second.push_back(decToHex(locationToUpdate));
-        //need to handle X register here
         records[recordNo].second.push_back(decToHex(LOCCTR));
         records[recordNo].first += (int)decToHex(LOCCTR).size();
         recordNo++;
@@ -464,6 +499,7 @@ void Assembler::generateObjectCode()
 
     sourceFile.close();
 
+
     // for (auto i : records)
     // {
     //     cout << i.first << "->";
@@ -472,33 +508,8 @@ void Assembler::generateObjectCode()
     //     cout << endl;
     // }
 
-    ofstream symout(symtab_file_name.c_str());
-    for (auto it = SYMTAB.begin(); it != SYMTAB.end(); ++it)
-    {
-        symout << it->first << "\t:\t" << decToHex((it->second).first) << endl;
-    }
-    symout.close();
-
-    ofstream objout(object_file_name.c_str());
-    objout << "H^" << program_name << string("000000").replace(6 - decToHex(starting_address).size(), 6, decToHex(starting_address)) << "^";
-    objout << string("000000").replace(6 - decToHex(ending_address - starting_address + 3).size(), 6, decToHex(ending_address - starting_address)) << endl;
-    for (int i = 0; i <= recordNo; i++)
-    {
-        if (records[i].second.size() == 0)
-        {
-            continue;
-        }
-        objout << "T^" << string("000000").replace(6 - (records[i].second)[0].size(), 6, (records[i].second)[0]) << "^" << string("00").replace(2 - decToHex(records[i].first / 2).size(), 2, decToHex(records[i].first / 2)) << "^";
-        for (int j = 1; j < records[i].second.size(); j++)
-        {
-            if (j != records[i].second.size() - 1)
-                objout << (records[i].second)[j] << "^";
-            else
-                objout << (records[i].second)[j] << endl;
-        }
-    }
-    objout << "E^" << string("000000").replace(6 - decToHex(first_executable_instruction).size(), 6, decToHex(first_executable_instruction)) << endl;
-    objout.close();
+    writeSYMTABFile();
+    writeObjectFile();
 }
 
 void assembleNewProgram()
@@ -515,7 +526,7 @@ void assembleNewProgram()
     system("./loader.sh 1");
     if (!fileExists(src) || !fileExists(optab))
     {
-        cout << "\n\t\t SOURCE FILE DOESN'T EXISTS\n\n";
+        cout << "\n\t\tSOURCE FILE DOESN'T EXISTS\n\n";
         system("sleep 3");
         return;
     }
@@ -555,6 +566,7 @@ void assembleNewProgram()
 
         default:
             cout << "\t\tEnter valid choice\n\n";
+            system("sleep 1");
             break;
         }
     }
