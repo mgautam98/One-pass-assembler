@@ -504,6 +504,8 @@ void assembleNewProgram()
     cin >> object;
     symtab = "symtab.txt";
     optab = "optab.txt";
+    system("chmod +x loader.sh");
+    system("./loader.sh");
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\t SOURCE FILE DOESN'T EXISTS\n\n";
