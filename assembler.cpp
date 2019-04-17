@@ -1,3 +1,10 @@
+/*
+                            ONE PASS ASSEMBLER WITH OBJECT CODE 
+                                        AUTHORS  
+                                Gautam Mishra  &  Archit
+                                    Date : 16/04/19 
+*/
+
 #ifdef __unix__
 
 #define OS_Windows 0
@@ -505,7 +512,7 @@ void assembleNewProgram()
     symtab = "symtab.txt";
     optab = "optab.txt";
     system("chmod +x loader.sh");
-    system("./loader.sh");
+    system("./loader.sh 1");
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\t SOURCE FILE DOESN'T EXISTS\n\n";
@@ -531,7 +538,7 @@ void assembleNewProgram()
         }
         cout << "\t\t\t\t\t";
         cin >> inp;
-        cout<<inp<<endl;
+        system("./loader.sh 0.5");
         if (inp == 4)
             break;
         switch (inp)

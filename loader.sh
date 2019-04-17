@@ -1,6 +1,6 @@
 #!/bin/bash
 # your real command here, instead of sleep
-sleep 1 &
+sleep $1 &
 PID=$!
 i=1
 sp="/-\|"
