@@ -161,7 +161,7 @@ void Assembler::displaySourceCode()
     {
         cout << "\t\t" << line << endl;
     }
-    cout << "\n\t\t================================================\n";
+    cout << "\t\t================================================\n";
     file.close();
     return;
 }
@@ -174,7 +174,7 @@ void Assembler::displayOptab()
     {
         cout << "\t\t" << i.first << "\t\t:\t\t" << i.second << endl;
     }
-    cout << "\n\t\t================================================\n";
+    cout << "\t\t================================================\n";
     return;
 }
 
@@ -185,7 +185,7 @@ void Assembler::displayObjectCode()
     cout << "\t\t================================================\n";
     for (string line; getline(file, line);)
         cout << "\t\t" << line << endl;
-    cout << "\n\t\t================================================\n";
+    cout << "\t\t================================================\n";
     file.close();
     return;
 }
@@ -504,8 +504,8 @@ void assembleNewProgram()
     cin >> object;
     symtab = "symtab.txt";
     optab = "optab.txt";
-    system("chmod +x loader.sh");
-    system("./loader.sh");
+    system("chmod +x Shell/loader.sh");
+    system("./Shell/loader.sh");
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\t SOURCE FILE DOESN'T EXISTS\n\n";
@@ -518,8 +518,8 @@ void assembleNewProgram()
     {
         if (!OS_Windows)
         {
-            system("chmod +x assemblerMenu.sh");
-            system("./assemblerMenu.sh");
+            system("chmod +x Shell/assemblerMenu.sh");
+            system("./Shell/assemblerMenu.sh");
         }
         else
         {
@@ -562,8 +562,8 @@ int main()
     {
         if (!OS_Windows)
         {
-            system("chmod +x menu.sh");
-            system("./menu.sh");
+            system("chmod +x Shell/menu.sh");
+            system("./Shell/menu.sh");
         }
         else
         {
