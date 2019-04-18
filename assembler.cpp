@@ -522,8 +522,8 @@ void assembleNewProgram()
     cin >> object;
     symtab = "symtab.txt";
     optab = "optab.txt";
-    system("chmod +x loader.sh");
-    system("./loader.sh 1");
+    system("chmod +x src/loader.sh");
+    system("./src/loader.sh 1");
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\tSOURCE FILE DOESN'T EXISTS\n\n";
@@ -536,8 +536,8 @@ void assembleNewProgram()
     {
         if (!OS_Windows)
         {
-            system("chmod +x assemblerMenu.sh");
-            system("./assemblerMenu.sh");
+            system("chmod +x src/assemblerMenu.sh");
+            system("./src/assemblerMenu.sh");
         }
         else
         {
@@ -549,7 +549,7 @@ void assembleNewProgram()
         }
         cout << "\t\t\t\t\t";
         cin >> inp;
-        system("./loader.sh 0.5");
+        system("./src/loader.sh 0.5");
         if (inp == 4)
             break;
         switch (inp)
@@ -581,8 +581,8 @@ int main()
     {
         if (!OS_Windows)
         {
-            system("chmod +x menu.sh");
-            system("./menu.sh");
+            system("chmod +x src/menu.sh");
+            system("./src/menu.sh");
         }
         else
         {
