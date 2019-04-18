@@ -499,7 +499,6 @@ void Assembler::generateObjectCode()
 
     sourceFile.close();
 
-
     // for (auto i : records)
     // {
     //     cout << i.first << "->";
@@ -522,16 +521,30 @@ void assembleNewProgram()
     cin >> object;
     symtab = "symtab.txt";
     optab = "optab.txt";
-    system("chmod +x src/loader.sh");
-    system("./src/loader.sh 1");
+    if (!OS_Windows)
+    {
+        system("chmod +x src/loader.sh");
+        system("./src/loader.sh 1");
+    }
     if (!fileExists(src) || !fileExists(optab))
     {
         cout << "\n\t\tSOURCE FILE DOESN'T EXISTS\n\n";
-        system("sleep 3");
+        if (!OS_Windows)
+            system("sleep 3");
+        else
+        {
+            system("timeout 3");
+        }
         return;
     }
     Assembler newProgram(src, optab, symtab, object);
-    system("clear");
+    if (!OS_Windows)
+        system("clear");
+    else
+    {
+        system("cls");
+    }
+
     while (1)
     {
         if (!OS_Windows)
@@ -549,7 +562,9 @@ void assembleNewProgram()
         }
         cout << "\t\t\t\t\t";
         cin >> inp;
-        system("./src/loader.sh 0.5");
+        if (!OS_Windows){
+            system("./src/loader.sh 0.5");
+        }
         if (inp == 4)
             break;
         switch (inp)
@@ -566,7 +581,14 @@ void assembleNewProgram()
 
         default:
             cout << "\t\tEnter valid choice\n\n";
-            system("sleep 1");
+            if (!OS_Windows)
+            {
+                system("sleep 1");
+            }
+            else
+            {
+                system("timeout 1");
+            }
             break;
         }
     }
@@ -586,7 +608,7 @@ int main()
         }
         else
         {
-            system("clear");
+            system("cls");
             cout << "\t\tONE PASS ASSEMBLER WITH OBJECT CODE\n\n\n";
             cout << "\t\t1. Assemble new program\n";
             cout << "\t\t2. Exit\n\n";
@@ -604,7 +626,14 @@ int main()
             break;
         default:
             cout << "\n\t\tInvalid Input\n\n";
-            system("sleep 1");
+            if (!OS_Windows)
+            {
+                system("sleep 1");
+            }
+            else
+            {
+                system("timeout 1");
+            }
         }
     }
 
