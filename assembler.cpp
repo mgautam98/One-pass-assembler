@@ -530,7 +530,9 @@ void assembleNewProgram()
     {
         cout << "\n\t\tSOURCE FILE DOESN'T EXISTS\n\n";
         if (!OS_Windows)
+        {
             system("sleep 3");
+        }
         else
         {
             system("timeout 3");
@@ -539,7 +541,9 @@ void assembleNewProgram()
     }
     Assembler newProgram(src, optab, symtab, object);
     if (!OS_Windows)
+    {
         system("clear");
+    }
     else
     {
         system("cls");
@@ -562,7 +566,8 @@ void assembleNewProgram()
         }
         cout << "\t\t\t\t\t";
         cin >> inp;
-        if (!OS_Windows){
+        if (!OS_Windows)
+        {
             system("./src/loader.sh 0.5");
         }
         if (inp == 4)
