@@ -23,10 +23,10 @@ Loc      Source Statement                     Object code
         .       SUBROUTINE TO READ RECORD INTO BUFFER
         .
 2039    INPUT   BYTE    X'F1'                     F1
-203A    MAXLEN	WORD    4096                       001000
+203A    MAXLEN  WORD    4096                      001000
         .
-203D    RDREC	LDX     ZERO                        041006
-2040            LDA     ZERO                      001006
+203D    RDREC   LDX     ZERO                      041006
+2040    LDA     ZERO                              001006
 2043    RLOOP   TD      INPUT                     E02039
 2046            JEQ     RLOOP                     302043
 2049            RD      INPUT                     D82039
