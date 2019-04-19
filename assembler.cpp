@@ -467,7 +467,7 @@ void Assembler::generateObjectCode()
                     constantValue += decToHex((int)operand[3]);
                     if (operand.size() == 6)
                     {
-                        constantValue += decToHex((int)operand[3]);
+                        constantValue += decToHex((int)operand[4]);
                     }
                     newLocation += operand.length() - 3;
                 }
