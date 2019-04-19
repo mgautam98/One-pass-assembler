@@ -46,6 +46,7 @@ class Assembler
     string symtab_file_name;
     string optab_file_name;
     string object_file_name;
+    string listing_file_name;
     string header_record;
     string end_record;
     string program_name;
@@ -56,7 +57,7 @@ class Assembler
     int recordNo;
 
   public:
-    Assembler(string src, string optab, string symtab, string obj);
+    Assembler(string src, string optab, string symtab, string obj, string listing);
     void displaySourceCode();
     void displayOptab();
     void displayObjectCode();
@@ -149,7 +150,7 @@ vector<string> Assembler::tokenize(string str)
     return tokens;
 }
 
-Assembler::Assembler(string src, string optab, string symtab, string obj)
+Assembler::Assembler(string src, string optab, string symtab, string obj, string listing)
 {
     program_name = "      ";
     recordNo = 0;
@@ -157,6 +158,7 @@ Assembler::Assembler(string src, string optab, string symtab, string obj)
     symtab_file_name = symtab;
     optab_file_name = optab;
     object_file_name = obj;
+    listing_file_name = listing;
     populateOPTAB();
     generateObjectCode();
 }
@@ -286,9 +288,9 @@ void Assembler::addRecord(string rec, bool createNewTextRecord)
 void Assembler::generateObjectCode()
 {
     bool firstLine = true;
-    string label, opcode, operand;
+    string label, opcode, operand, LIST;
     ifstream sourceFile(src_file_name.c_str());
-
+    ofstream listingFile(listing_file_name.c_str());
     for (string line; getline(sourceFile, line);)
     {
         vector<string> tokens = tokenize(line);
@@ -319,6 +321,10 @@ void Assembler::generateObjectCode()
                 LOCCTR = 0;
                 starting_address = 0;
             }
+
+            LIST = (string)decToHex(LOCCTR) + "    " + (string)line;
+            listingFile << "Loc" << "      Source Statement        " << "             Object code"<<endl; 
+            listingFile << endl << LIST << endl;
             continue;
         }
 
@@ -340,12 +346,17 @@ void Assembler::generateObjectCode()
             }
             else
                 first_executable_instruction = starting_address;
+
+            LIST = "        " + (string)line;
+            listingFile << LIST << endl;
             continue;
         }
 
         //comment line
         if (tokens[0].compare(".") == 0)
         {
+            LIST = "        " + (string)line;
+            listingFile << LIST << endl;
             continue;
         }
 
@@ -432,7 +443,9 @@ void Assembler::generateObjectCode()
                 temp = decToHex(hexToDec(temp) | 8);
                 newRecord[2] = temp[0];
             }
-
+            string Line = "                                      ";
+            LIST = (string)decToHex(LOCCTR) + "    " + Line.replace(0, line.size(), line) + "    " + newRecord;
+            listingFile << LIST << endl;
             addRecord(newRecord, false);
             LOCCTR += 3;
         }
@@ -467,7 +480,7 @@ void Assembler::generateObjectCode()
                     constantValue += decToHex((int)operand[3]);
                     if (operand.size() == 6)
                     {
-                        constantValue += decToHex((int)operand[3]);
+                        constantValue += decToHex((int)operand[4]);
                     }
                     newLocation += operand.length() - 3;
                 }
@@ -492,11 +505,14 @@ void Assembler::generateObjectCode()
                 temp = decToHex(hexToDec(temp) | 8);
                 newRecord[2] = temp[0];
             }
+            string Line = "                                      ";
+            LIST = (string)decToHex(LOCCTR) + "    " + Line.replace(0, line.size(), line) + "    " + newRecord;
+            listingFile << LIST << endl;
             addRecord(newRecord, false);
             LOCCTR = newLocation;
         }
     }
-
+    listingFile.close();
     sourceFile.close();
 
     // for (auto i : records)
@@ -514,13 +530,14 @@ void Assembler::generateObjectCode()
 void assembleNewProgram()
 {
     int inp;
-    string src, optab, object, symtab;
+    string src, optab, object, symtab, listing;
     cout << "\n\t\tSource File Name  :  ";
     cin >> src;
     cout << "\t\tFile name where Object Code will be stored  :  ";
     cin >> object;
     symtab = "symtab.txt";
     optab = "optab.txt";
+    listing = "assemblerlisting.txt";
     if (!OS_Windows)
     {
         system("chmod +x src/loader.sh");
@@ -539,7 +556,7 @@ void assembleNewProgram()
         }
         return;
     }
-    Assembler newProgram(src, optab, symtab, object);
+    Assembler newProgram(src, optab, symtab, object, listing);
     if (!OS_Windows)
     {
         system("clear");
